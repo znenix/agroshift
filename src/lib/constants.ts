@@ -174,6 +174,8 @@ export const NDVI_MIN_SEASON_COMPOSITES = 8;
 export const NDVI_RECENT_YEARS = 3;
 /** ASSUMPTION: a satellite-vs-farmer mismatch is reported when it lasts at least 3 composites (~48 days). */
 export const SATELLITE_MISMATCH_MIN_COMPOSITES = 3;
+/** ASSUMPTION: the satellite check gives a verdict only when at least this many composites could be judged. */
+export const SATELLITE_MIN_JUDGED_COMPOSITES = 8;
 /** ASSUMPTION: crops resting in December–February can look bare from space, so "crop expected but bare" is not judged then. */
 export const NDVI_WINTER_MONTHS: readonly number[] = [12, 1, 2];
 /** Spring frosts are those before 1 July (day 182), autumn frosts those from 1 July to 30 June of the next year. */

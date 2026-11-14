@@ -96,4 +96,10 @@ describe("what the satellite saw (SPEC §5.3)", () => {
       { year: 2024, kind: "green_where_bare_expected", from: "2024-07-11", to: "2024-09-12", composites: 4 },
     ]);
   });
+
+  it("gives no verdict (not a silent 'agrees') when there is no or too little satellite data", () => {
+    expect(satelliteCheck([], expected, 2, [2023, 2024, 2025])).toBeNull();
+    const few = composites([2023, 2024, 2025], (year, day) => (year === 2024 ? wheatYear(day) : cottonYear(day))).slice(0, 5);
+    expect(satelliteCheck(few, expected, 2, [2023, 2024, 2025])).toBeNull();
+  });
 });

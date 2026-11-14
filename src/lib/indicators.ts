@@ -79,6 +79,7 @@ export function fieldIndicators(profile: FieldProfile, soil: SoilConditions): In
   const texture = s.clay_pct !== null && s.sand_pct !== null && s.silt_pct !== null ? textureClass(s.clay_pct, s.sand_pct, s.silt_pct) : null;
   const salinity = profile.salinity;
   const fromTest = soil.eceSource === "soil_test";
+  const slope = profile.farm.terrain?.slope_pct ?? null;
   return [
     {
       id: "water",
@@ -193,13 +194,13 @@ export function fieldIndicators(profile: FieldProfile, soil: SoilConditions): In
     },
     {
       id: "slope",
-      value: profile.farm.terrain.slope_pct,
+      value: slope,
       valueKey: null,
       unit: "unit.pct",
-      status: profile.farm.terrain.slope_pct < 2 ? "good" : profile.farm.terrain.slope_pct <= 8 ? "watch" : "concern",
-      explanation: "indicator.slope",
-      params: { slope: profile.farm.terrain.slope_pct },
-      source: "copernicus-dem",
+      status: slope === null ? "unknown" : slope < 2 ? "good" : slope <= 8 ? "watch" : "concern",
+      explanation: slope === null ? "indicator.slope_unknown" : "indicator.slope",
+      params: { slope: slope ?? "–" },
+      source: slope === null ? null : "copernicus-dem",
       confidence: "medium",
     },
   ];

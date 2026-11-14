@@ -120,6 +120,13 @@ export const farmFileSchema = z.object({
 });
 export type FarmFile = z.infer<typeof farmFileSchema>;
 
+/**
+ * A field the engines can analyse: a demo farm, or a map point assembled from a climate cell and
+ * /api/point. A point may lack land cover or terrain when an upstream request failed (information gap).
+ */
+export const siteFileSchema = farmFileSchema.extend({ land_cover: landCoverSchema.nullable(), terrain: terrainSchema.nullable() });
+export type SiteFile = z.infer<typeof siteFileSchema>;
+
 export const cellFileSchema = z.object({
   version: z.literal(1),
   id: z.string(),

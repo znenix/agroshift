@@ -11,6 +11,7 @@ import {
   NDVI_GREEN_MIN,
   NDVI_MIN_SEASON_COMPOSITES,
   NDVI_WINTER_MONTHS,
+  SATELLITE_MIN_JUDGED_COMPOSITES,
   SATELLITE_MISMATCH_MIN_COMPOSITES,
 } from "./constants";
 import type { Crop } from "./crops";
@@ -215,7 +216,8 @@ export function satelliteCheck(
     const score = judged.filter((j) => j.kind === null).length - judged.filter((j) => j.kind !== null).length;
     if (best === null || score > best.score) best = { phase, judged, score };
   }
-  if (best === null) return null;
+  // Too little observed to say anything: "not enough satellite data", never a silent "agrees".
+  if (best === null || best.judged.length < SATELLITE_MIN_JUDGED_COMPOSITES) return null;
 
   const mismatches: SatelliteMismatch[] = [];
   let run: Judged[] = [];

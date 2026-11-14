@@ -5,7 +5,8 @@
  * paired with an icon and a text label, never colour alone.
  */
 import type { ReactNode } from "react";
-import type { SourceId, SourceRef } from "@/lib/datafiles";
+import { sourceIdSchema, type SourceId, type SourceRef } from "@/lib/datafiles";
+import { sourceRef } from "@/lib/datasources";
 import type { IndicatorStatus } from "@/lib/indicators";
 import type { MessageKey } from "@/lib/i18n";
 import type { Confidence } from "@/lib/rotations";
@@ -35,7 +36,9 @@ export function SourceChip({
   label?: string;
 }) {
   const { t } = useI18n();
-  const ref = refs.find((r) => r.id === source);
+  // The field's own reference (with its retrieval date), else the standard description of the source.
+  const known = sourceIdSchema.safeParse(source);
+  const ref = refs.find((r) => r.id === source) ?? (known.success && CHIP_KEYS[known.data] === undefined ? sourceRef(known.data, null) : undefined);
   const keys = CHIP_KEYS[source];
   const label = labelOverride ?? ref?.label ?? (keys === undefined ? source : t(keys.label));
   const title = ref?.citation ?? (keys === undefined ? undefined : t(keys.title));

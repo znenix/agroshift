@@ -10,13 +10,25 @@ import type { SoilConditions } from "@/lib/crops";
 import { dayMonth, monthShort } from "@/lib/format";
 import { formatNumber, type MessageKey } from "@/lib/i18n";
 import type { Indicator } from "@/lib/indicators";
+import { isPointSite, type PointGap } from "@/lib/point";
 import type { TrendResult } from "@/lib/trends";
 import { DataTable } from "./DataTable";
 
 const MONTH_START_DOY = [1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335];
 const CLIMATE_INDICATORS: ReadonlyArray<Indicator["id"]> = ["water", "heat", "frost", "extreme_rain", "vegetation"];
 
-export function StepConditions({ profile, indicators, soil }: { profile: FieldProfile; indicators: readonly Indicator[]; soil: SoilConditions }) {
+export function StepConditions({
+  profile,
+  indicators,
+  soil,
+  gaps,
+}: {
+  profile: FieldProfile;
+  indicators: readonly Indicator[];
+  soil: SoilConditions;
+  /** Map points only: what could not be fetched (each shown as an information gap). */
+  gaps: readonly PointGap[];
+}) {
   const { t, locale } = useI18n();
   const farm = profile.farm;
   const refs = farm.sources;
@@ -34,6 +46,8 @@ export function StepConditions({ profile, indicators, soil }: { profile: FieldPr
   const bare = profile.ndvi.bare.map((b) => ({ from: b.fromDoy, to: b.toDoy }));
   const monthTicks = MONTH_START_DOY.map((doy, m) => ({ doy, label: monthShort(m + 1, locale) }));
   const frost = profile.frost;
+  const isPoint = isPointSite(farm);
+  const hasNdvi = farm.ndvi.composites.some((c) => c.ndvi !== null);
 
   const trends: ReadonlyArray<{ label: MessageKey; result: TrendResult | null; digits: number; source: "nasa-power" | "modis-ornl" }> = [
     { label: "trend.precip", result: profile.trends.precipMm, digits: 0, source: "nasa-power" },
@@ -51,14 +65,26 @@ export function StepConditions({ profile, indicators, soil }: { profile: FieldPr
           {farm.names[locale]}
         </h2>
         <p className="text-sm text-ink-muted tabular-nums">
-          {t("conditions.location", {
-            lat: farm.point.lat.toFixed(3),
-            lon: farm.point.lon.toFixed(3),
-            km: num(farm.point.distance_km, 1),
-            city: farm.city.names[locale],
-            cell: farm.climate.cell.id,
-          })}
+          {isPoint
+            ? t("conditions.location_point", { region: farm.city.names[locale], cell: farm.climate.cell.id })
+            : t("conditions.location", {
+                lat: farm.point.lat.toFixed(3),
+                lon: farm.point.lon.toFixed(3),
+                km: num(farm.point.distance_km, 1),
+                city: farm.city.names[locale],
+                cell: farm.climate.cell.id,
+              })}
         </p>
+        {gaps.length > 0 && (
+          <div role="note" className="mt-2 rounded-md border border-status-warning bg-status-warning/15 px-3 py-2 text-sm">
+            <p className="font-medium">{t("point.gaps_title")}</p>
+            <ul className="list-disc pl-5">
+              {gaps.map((g) => (
+                <li key={g}>{t(`point.gap.${g}`)}</li>
+              ))}
+            </ul>
+          </div>
+        )}
       </section>
 
       <section aria-labelledby="indicators-title" className="space-y-3">
@@ -171,6 +197,10 @@ export function StepConditions({ profile, indicators, soil }: { profile: FieldPr
             <SourceChip source="modis-ornl" refs={refs} />
           </div>
         </div>
+        {!hasNdvi ? (
+          <p className="rounded-lg border border-sand-300 bg-white p-4">{t("conditions.no_satellite")}</p>
+        ) : (
+        <>
         <div className="rounded-lg border border-sand-300 bg-white p-4">
           <NdviCurveChart
             data={ndvi}
@@ -203,6 +233,8 @@ export function StepConditions({ profile, indicators, soil }: { profile: FieldPr
             {t("conditions.cropland_pixels", { cropland: farm.ndvi.cropland_pixels, total: farm.ndvi.pixels, year: String(farm.ndvi.mask_land_cover_year) })}
           </li>
         </ul>
+        </>
+        )}
       </section>
 
       <section aria-labelledby="soil-title" className="space-y-3">

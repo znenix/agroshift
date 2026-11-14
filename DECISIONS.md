@@ -169,3 +169,12 @@ Small implementation choices taken without asking (CLAUDE.md §1.2), one line ea
 - **While recalculating,** the last computed scenario stays on screen (dimmed) instead of flashing back to the observed climate.
 - **Scenario state** lives in memory for the session and is not in the URL.
 - **Observation, not tuned.** At Karakalpakstan (about 106 mm of rain a year) the dry-year preset barely changes the irrigation need, because rain is a tiny share of the water balance. Hot +2 °C raises the dry-year need by about 700–1,300 m³/ha. With neutral priorities the order of rotations does not change.
+
+## Phase 4 — map and map points (2026-11-14)
+
+- **/api/point** (SPEC §8): 8 s per upstream, a 40 s overall deadline, partial results with gaps. Complete answers are cached 7 days; partial answers 5 minutes, so missing parts can be retried. Climate comes from the static POWER cell.
+- **Points rounded to 0.001°** (~100 m) for caching. A map point starts from cotton–wheat (ASSUMPTION, SPEC §1).
+- **No cropland pixel in the 1 km window** → no NDVI curve (`not_cropland` gap).
+- **Satellite check gives no verdict below 8 judged composites** (ASSUMPTION). This fixes a silent "agrees" when there was no data.
+- **MapLibre 6 worker** is copied to public/maplibre/ before dev/build (`scripts/copy-maplibre-worker.mjs`), because Turbopack does not emit it.
+- **Map layer classes:** heat days 10/30/60/90 and frost-free days 180/200/220/240 (ASSUMPTION); aridity uses the UNEP classes; rain trend is grey unless p < 0.05.

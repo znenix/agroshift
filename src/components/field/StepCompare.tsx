@@ -137,7 +137,7 @@ function SatelliteBanner({ profile, analysis }: { profile: FieldProfile; analysi
           </ul>
         </>
       )}
-      {share < MIXED_PIXEL_SHARE && <p className="text-sm text-ink-muted">{t("satellite.mixed_pixel", { share: Math.round(share * 100) })}</p>}
+      {ndvi.pixels > 0 && share < MIXED_PIXEL_SHARE && <p className="text-sm text-ink-muted">{t("satellite.mixed_pixel", { share: Math.round(share * 100) })}</p>}
     </section>
   );
 }

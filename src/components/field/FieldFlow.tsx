@@ -2,8 +2,9 @@
 
 /**
  * The /field flow (SPEC §2): choose field → field conditions → your farm → compare rotations → stress test. State
- * lives in the URL (?farm=&step=) so a step can be linked and the back button works. All engines run
- * in the browser on static files (SPEC §4.3).
+ * lives in the URL (?farm=&step= for a demo farm, ?lat=&lon=&step= for a map point) so a step can be
+ * linked and the back button works. All engines run in the browser (SPEC §4.3): demo farms come from
+ * static files, map points from the static climate cell plus /api/point.
  */
 import { useSearchParams } from "next/navigation";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
@@ -12,9 +13,10 @@ import { analyze, buildProfile, soilConditions, type FarmAnswers, type FieldProf
 import { CROPS, ROTATION_TEMPLATES } from "@/lib/catalog";
 import { NORMAL_SCENARIO, type Scenario } from "@/lib/climate";
 import type { RegionsFile } from "@/lib/datafiles";
-import type { MessageKey } from "@/lib/i18n";
+import type { MessageKey, TranslateFn } from "@/lib/i18n";
 import { fieldIndicators } from "@/lib/indicators";
-import { loadFarm, loadRegions } from "@/lib/staticdata";
+import { pointSite, pointSiteId, roundCoord, type PointGap } from "@/lib/point";
+import { ApiError, loadCell, loadFarm, loadPoint, loadRegions } from "@/lib/staticdata";
 import { StepChoose, type DemoFarm } from "./StepChoose";
 import { StepCompare } from "./StepCompare";
 import { StepConditions } from "./StepConditions";
@@ -47,10 +49,47 @@ function useDebounced<T>(value: T, ms: number): T {
 const normalized = (s: Scenario): Scenario => (s.deltaT === 0 && s.rainFactor === 1 ? NORMAL_SCENARIO : s);
 
 type Load<T> = { status: "loading" } | { status: "error"; message: string } | { status: "ready"; value: T };
+const NO_GAPS: readonly PointGap[] = [];
+
+/** A field to analyse: a demo farm, or any point inside Uzbekistan. */
+type Site =
+  | { kind: "demo"; key: string; farm: DemoFarm; defaultRotation: string }
+  | { kind: "point"; key: string; lat: number; lon: number; defaultRotation: string };
+
+/** ASSUMPTION: a map point starts from the standard cotton–wheat system (SPEC §1); the farmer changes it in step 3. */
+const POINT_DEFAULT_ROTATION = "cotton_wheat";
+
+interface Loaded {
+  profile: FieldProfile;
+  /** What could not be fetched for a map point (empty for demo farms). */
+  gaps: PointGap[];
+}
+
+const messageOf = (error: unknown) => (error instanceof Error ? error.message : String(error));
+
+/** User-facing text for a loading error; /api/point codes get their own sentence. */
+function errorText(t: TranslateFn, load: { message: string; code?: string }): string {
+  if (load.code === "outside_uzbekistan") return t("map.error.outside");
+  if (load.code === "invalid_point") return t("map.error.invalid");
+  return t("field.error", { message: load.message });
+}
+
+async function loadSite(site: Site, regions: RegionsFile): Promise<Loaded> {
+  const salinityOf = (region: string) => regions.regions.find((r) => r.id === region)?.salinity ?? null;
+  if (site.kind === "demo") {
+    const farm = await loadFarm(site.farm.id);
+    return { profile: buildProfile(farm, salinityOf(farm.region)), gaps: [] };
+  }
+  const point = await loadPoint(site.lat, site.lon);
+  const cell = await loadCell(point.cell);
+  const region = regions.regions.find((r) => r.id === point.region);
+  const names = region?.names ?? { uz: point.region, ru: point.region, en: point.region };
+  return { profile: buildProfile(pointSite(point, cell, names), salinityOf(point.region)), gaps: point.gaps };
+}
 
 /** Neutral defaults: every priority 1, irrigated furrow field; the current rotation is the demo farmer's answer. */
-function defaultAnswers(farm: DemoFarm): FarmAnswers {
-  const template = ROTATION_TEMPLATES.find((r) => r.id === farm.demo_rotation) ?? ROTATION_TEMPLATES[0];
+function defaultAnswers(rotationId: string): FarmAnswers {
+  const template = ROTATION_TEMPLATES.find((r) => r.id === rotationId) ?? ROTATION_TEMPLATES[0];
   return {
     current: { id: template?.id ?? "own", years: template?.years ?? [{ main: "cotton", second: null }] },
     priorities: { water_saving: 1, soil_health: 1, forage: 1, income_market: 1, low_risk: 1, simplicity: 1 },
@@ -67,9 +106,13 @@ function defaultAnswers(farm: DemoFarm): FarmAnswers {
   };
 }
 
-function navigate(params: { farm: string | null; step: number }) {
+function navigate(params: { farm?: string; point?: { lat: number; lon: number }; step: number }) {
   const search = new URLSearchParams();
-  if (params.farm !== null) search.set("farm", params.farm);
+  if (params.farm !== undefined) search.set("farm", params.farm);
+  if (params.point !== undefined) {
+    search.set("lat", String(roundCoord(params.point.lat)));
+    search.set("lon", String(roundCoord(params.point.lon)));
+  }
   search.set("step", String(params.step));
   window.history.pushState(null, "", `/field?${search.toString()}`);
   window.scrollTo({ top: 0 });
@@ -79,7 +122,12 @@ export function FieldFlow() {
   const { t } = useI18n();
   const search = useSearchParams();
   const farmParam = search.get("farm");
-  const stepParam = Number(search.get("step") ?? (farmParam === null ? 1 : 2));
+  const latParam = Number(search.get("lat") ?? NaN);
+  const lonParam = Number(search.get("lon") ?? NaN);
+  const hasPoint = Number.isFinite(latParam) && Number.isFinite(lonParam);
+  const pointLat = hasPoint ? roundCoord(latParam) : null;
+  const pointLon = hasPoint ? roundCoord(lonParam) : null;
+  const stepParam = Number(search.get("step") ?? (farmParam === null && !hasPoint ? 1 : 2));
 
   const [regions, setRegions] = useState<Load<RegionsFile>>({ status: "loading" });
   useEffect(() => {
@@ -95,33 +143,42 @@ export function FieldFlow() {
 
   const farms = regions.status === "ready" ? regions.value.demo_farms : [];
   const demoFarm = farms.find((f) => f.id === farmParam) ?? null;
-  const step = demoFarm === null ? 1 : Math.min(LAST_STEP, Math.max(1, Number.isFinite(stepParam) ? Math.round(stepParam) : 2));
+  const site = useMemo((): Site | null => {
+    if (demoFarm !== null) return { kind: "demo", key: demoFarm.id, farm: demoFarm, defaultRotation: demoFarm.demo_rotation };
+    if (pointLat !== null && pointLon !== null) {
+      return { kind: "point", key: pointSiteId(pointLat, pointLon), lat: pointLat, lon: pointLon, defaultRotation: POINT_DEFAULT_ROTATION };
+    }
+    return null;
+  }, [demoFarm, pointLat, pointLon]);
+  const step = site === null ? 1 : Math.min(LAST_STEP, Math.max(1, Number.isFinite(stepParam) ? Math.round(stepParam) : 2));
 
-  const [profiles, setProfiles] = useState<Readonly<Record<string, Load<FieldProfile>>>>({});
+  const [loads, setLoads] = useState<Readonly<Record<string, Load<Loaded> & { code?: string }>>>({});
   useEffect(() => {
-    if (demoFarm === null || regions.status !== "ready" || profiles[demoFarm.id] !== undefined) return;
-    const id = demoFarm.id;
-    const salinity = regions.value.regions.find((r) => r.id === demoFarm.region)?.salinity ?? null;
+    if (site === null || regions.status !== "ready" || loads[site.key] !== undefined) return;
+    const key = site.key;
     let live = true;
-    loadFarm(id).then(
-      (farm) => live && setProfiles((p) => ({ ...p, [id]: { status: "ready", value: buildProfile(farm, salinity) } })),
-      (error: unknown) => live && setProfiles((p) => ({ ...p, [id]: { status: "error", message: error instanceof Error ? error.message : String(error) } })),
+    loadSite(site, regions.value).then(
+      (value) => live && setLoads((l) => ({ ...l, [key]: { status: "ready", value } })),
+      (error: unknown) =>
+        live &&
+        setLoads((l) => ({ ...l, [key]: { status: "error", message: messageOf(error), ...(error instanceof ApiError ? { code: error.code } : {}) } })),
     );
     return () => {
       live = false;
     };
-  }, [demoFarm, regions, profiles]);
+  }, [site, regions, loads]);
 
-  const [answersByFarm, setAnswersByFarm] = useState<Readonly<Record<string, FarmAnswers>>>({});
-  const defaults = useMemo(() => (demoFarm === null ? null : defaultAnswers(demoFarm)), [demoFarm]);
-  const answers = demoFarm === null ? null : (answersByFarm[demoFarm.id] ?? defaults);
+  const [answersBySite, setAnswersBySite] = useState<Readonly<Record<string, FarmAnswers>>>({});
+  const defaults = useMemo(() => (site === null ? null : defaultAnswers(site.defaultRotation)), [site]);
+  const answers = site === null ? null : (answersBySite[site.key] ?? defaults);
   const setAnswers = (next: FarmAnswers) => {
-    if (demoFarm !== null) setAnswersByFarm((a) => ({ ...a, [demoFarm.id]: next }));
+    if (site !== null) setAnswersBySite((a) => ({ ...a, [site.key]: next }));
   };
   const deferredAnswers = useDeferredValue(answers);
 
-  const loaded = demoFarm === null ? undefined : profiles[demoFarm.id];
-  const profile = loaded?.status === "ready" ? loaded.value : null;
+  const loaded = site === null ? undefined : loads[site.key];
+  const profile = loaded?.status === "ready" ? loaded.value.profile : null;
+  const gaps = loaded?.status === "ready" ? loaded.value.gaps : NO_GAPS;
   const soil = useMemo(() => (profile === null || answers === null ? null : soilConditions(profile, answers.soilTest)), [profile, answers]);
   const indicators = useMemo(() => (profile === null || soil === null ? [] : fieldIndicators(profile, soil)), [profile, soil]);
   const analysis = useMemo(
@@ -138,14 +195,15 @@ export function FieldFlow() {
   }, [analysis, profile, deferredAnswers, debouncedScenario, step]);
   const scenarioPending = scenario.deltaT !== debouncedScenario.deltaT || scenario.rainFactor !== debouncedScenario.rainFactor;
 
-  const go = (n: number) => navigate({ farm: demoFarm?.id ?? null, step: n });
+  const go = (n: number) =>
+    navigate({ ...(site?.kind === "demo" ? { farm: site.key } : {}), ...(site?.kind === "point" ? { point: site } : {}), step: n });
 
   return (
     <div className="space-y-6">
       <nav aria-label={t("field.steps_label")}>
         <ol className="flex flex-wrap gap-2">
           {STEPS.map(({ n, label }) => {
-            const enabled = n === 1 || demoFarm !== null;
+            const enabled = n === 1 || site !== null;
             return (
               <li key={n}>
                 <button
@@ -168,15 +226,23 @@ export function FieldFlow() {
       {regions.status === "error" && <ErrorBox message={t("field.error", { message: regions.message })} />}
 
       {regions.status === "ready" && step === 1 && (
-        <StepChoose farms={farms} selectedId={demoFarm?.id ?? null} onChoose={(id) => navigate({ farm: id, step: 2 })} />
+        <StepChoose
+          farms={farms}
+          selectedId={demoFarm?.id ?? null}
+          point={site?.kind === "point" ? site : null}
+          onChoose={(id) => navigate({ farm: id, step: 2 })}
+          onPoint={(lat, lon) => navigate({ point: { lat, lon }, step: 2 })}
+        />
       )}
 
-      {step > 1 && loaded?.status === "error" && <ErrorBox message={t("field.error", { message: loaded.message })} />}
-      {step > 1 && (loaded === undefined || loaded.status === "loading") && <Skeleton label={t("field.loading")} />}
+      {step > 1 && loaded?.status === "error" && <ErrorBox message={errorText(t, loaded)} />}
+      {step > 1 && (loaded === undefined || loaded.status === "loading") && (
+        <Skeleton label={t(site?.kind === "point" ? "map.loading_point" : "field.loading")} visible={site?.kind === "point"} />
+      )}
 
       {profile !== null && answers !== null && soil !== null && (
         <>
-          {step === 2 && <StepConditions profile={profile} indicators={indicators} soil={soil} />}
+          {step === 2 && <StepConditions profile={profile} indicators={indicators} soil={soil} gaps={gaps} />}
           {step === 3 && <StepFarm answers={answers} onChange={setAnswers} />}
           {step === COMPARE_STEP && (analysis === null ? <Skeleton label={t("field.loading")} /> : <StepCompare profile={profile} analysis={analysis} />)}
           {step === STRESS_STEP &&
@@ -188,7 +254,7 @@ export function FieldFlow() {
         </>
       )}
 
-      {demoFarm !== null && (
+      {site !== null && (
         <div className="flex justify-between border-t border-sand-300 pt-4">
           <button type="button" onClick={() => go(step - 1)} disabled={step === 1} className="rounded border border-sand-300 bg-white px-4 py-2 font-medium disabled:invisible">
             {t("field.back")}
@@ -207,10 +273,10 @@ export function FieldFlow() {
   );
 }
 
-function Skeleton({ label }: { label: string }) {
+function Skeleton({ label, visible = false }: { label: string; visible?: boolean }) {
   return (
     <div role="status" className="space-y-3">
-      <span className="sr-only">{label}</span>
+      <span className={visible ? "block text-ink-muted" : "sr-only"}>{label}</span>
       <div aria-hidden className="h-8 w-1/3 animate-pulse rounded bg-sand-100" />
       <div aria-hidden className="grid gap-3 sm:grid-cols-3">
         {[0, 1, 2].map((i) => (

@@ -46,3 +46,6 @@ next-env.d.ts
 
 # handed-over spec bundle; its files are committed as CLAUDE.md and docs/SPEC.md
 /agroshift-spec.zip
+
+# copied from node_modules/maplibre-gl before dev/build (scripts/copy-maplibre-worker.mjs)
+public/maplibre/

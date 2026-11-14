@@ -23,7 +23,7 @@ import {
 } from "./climate";
 import { CLIMATOLOGY_FIRST_YEAR, CLIMATOLOGY_LAST_YEAR, NDVI_RECENT_YEARS, SALINITY_CLASS_ECE } from "./constants";
 import { calendarContext, cropFit, type Crop, type CropFit, type SoilConditions } from "./crops";
-import type { FarmFile, RegionsFile } from "./datafiles";
+import type { RegionsFile, SiteFile } from "./datafiles";
 import {
   barePeriods,
   expectedCover,
@@ -42,7 +42,7 @@ import { dailyEt0 } from "./water";
 export type RegionSalinity = RegionsFile["regions"][number]["salinity"];
 
 export interface FieldProfile {
-  farm: FarmFile;
+  farm: SiteFile;
   climate: DailyClimate;
   et0: (number | null)[];
   /** Complete, non-excluded years 2006–2025 used for statistics. */
@@ -62,7 +62,7 @@ export function recentYears(): number[] {
 }
 
 /** Everything about the field that does not depend on the farmer's answers (step 2). */
-export function buildProfile(farm: FarmFile, salinity: RegionSalinity | null): FieldProfile {
+export function buildProfile(farm: SiteFile, salinity: RegionSalinity | null): FieldProfile {
   const climate = decodeClimate(farm.climate, farm.point.lat);
   const usable = new Set(farm.climate.years.filter((y) => y.complete && !y.excluded).map((y) => y.year));
   const years = completeYears(climate).filter((y) => y >= CLIMATOLOGY_FIRST_YEAR && y <= CLIMATOLOGY_LAST_YEAR && usable.has(y));
@@ -106,7 +106,7 @@ export function soilConditions(profile: FieldProfile, test: SoilTest): SoilCondi
     ph: test.ph ?? profile.farm.soil.ph_h2o,
     ece,
     eceSource: test.ece !== null ? "soil_test" : regional !== null ? "regional_estimate" : null,
-    slopePct: profile.farm.terrain.slope_pct,
+    slopePct: profile.farm.terrain?.slope_pct ?? null,
   };
 }
 
