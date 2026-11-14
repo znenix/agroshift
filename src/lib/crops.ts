@@ -31,7 +31,12 @@ const int = z.number().int();
 const localizedName = z.object({ uz: z.string().min(1), ru: z.string().min(1), en: z.string().min(1) });
 
 const mainSowingSchema = z.discriminatedUnion("type", [
-  z.object({ type: z.literal("spring"), tmean_above_c: z.number() }),
+  z.object({
+    type: z.literal("spring"),
+    tmean_above_c: z.number(),
+    /** Earliest sowing date ("MM-DD") from local practice, whatever the weather. */
+    not_before: z.string().regex(/^\d{2}-\d{2}$/).optional(),
+  }),
   z.object({ type: z.literal("autumn"), tmean_below_c: z.number() }),
 ]);
 const secondSowingSchema = z.object({ type: z.literal("after_previous"), gap_days: int.min(0) });
@@ -180,7 +185,8 @@ export function mainSeason(crop: Crop, ctx: CalendarContext, harvestYear: number
   if (rule === null || days === null) return null;
   const window = rule.type === "spring" ? SPRING_SOWING_WINDOW : AUTUMN_SOWING_WINDOW;
   const year = rule.type === "spring" ? harvestYear : harvestYear - 1;
-  const from = indexOfDate(ctx.climate, `${year}-${window.from}`);
+  const earliest = rule.type === "spring" && rule.not_before !== undefined && rule.not_before > window.from ? rule.not_before : window.from;
+  const from = indexOfDate(ctx.climate, `${year}-${earliest}`);
   const to = indexOfDate(ctx.climate, `${year}-${window.to}`);
   if (from < 0 || to < 0) return null;
   for (let i = from; i <= to; i++) {
@@ -287,6 +293,8 @@ export interface CropFit {
   subFits: { temperature: number | null; ph: number | null; salinity: number | null; season: number | null };
   hardBlockers: Reason[];
   softBlockers: Reason[];
+  /** Warnings that never change the category (heat from regional air temperature, confidence low). */
+  warnings: Reason[];
   /** Limiting factors worth explaining even when not blocking. */
   limits: Reason[];
   gaps: Reason[];
@@ -344,6 +352,7 @@ export function cropFit(
   const name = crop.id;
   const hardBlockers: Reason[] = [];
   const softBlockers: Reason[] = [];
+  const warnings: Reason[] = [];
   const limits: Reason[] = [];
   const gaps: Reason[] = [];
 
@@ -417,8 +426,10 @@ export function cropFit(
 
   // Heat in the sensitive window and frost after sowing, as shares of years.
   const heatShare = shareTrue(seasons.map(({ season }) => heatHit(crop, season, ctx.climate)));
+  // Heat is a warning only, never a blocker (team decision 2026-11-14): POWER gives regional air
+  // temperature without irrigation, and irrigated fields are usually cooler. Confidence: low.
   if (heatShare !== null && heatShare >= HEAT_WINDOW_SOFT_SHARE) {
-    softBlockers.push({ key: "crop.reason.heat_window", params: { crop: name, share: pct(heatShare), threshold: crop.heat_threshold_c ?? "" } });
+    warnings.push({ key: "crop.warning.heat_window", params: { crop: name, share: pct(heatShare), threshold: crop.heat_threshold_c ?? "" } });
   }
   const frostShare = shareTrue(seasons.map(({ season }) => frostHit(crop, season, ctx.climate)));
   if (frostShare !== null && frostShare >= FROST_AFTER_SOWING_SOFT_SHARE) {
@@ -444,6 +455,7 @@ export function cropFit(
     },
     hardBlockers,
     softBlockers,
+    warnings,
     limits,
     gaps,
     needsSoilTest,

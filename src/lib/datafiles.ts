@@ -180,6 +180,8 @@ export const regionsFileSchema = z.object({
       city: localizedNameSchema,
       lat: z.number(),
       lon: z.number(),
+      /** Default answer of the demo farmer (rotation id). */
+      demo_rotation: z.string(),
       file: z.string(),
     }),
   ),

@@ -1,5 +1,5 @@
 {
-  "about": "Regions and demo farms (SPEC §4.1, §4.2). Names are team-curated (uz/ru proofreading pending). Each demo farm's `city` is an approximate city centre used only as the start of the cropland search; `point` is written by `npm run prefetch` (nearest cropland pixel with high summer NDVI within 25 km, inside the farm's region). Review the diff of `point` before committing.",
+  "about": "Regions and demo farms (SPEC §4.1, §4.2). Names are team-curated (uz/ru proofreading pending). Each demo farm's `city` is an approximate city centre used only as the start of the cropland search; `point` is written by `npm run prefetch` (nearest cropland pixel with high summer NDVI within 25 km, inside the farm's region). `demo_rotation` is the default answer of the demo farmer (the rotation the demo starts from; Karakalpakstan follows the satellite: cotton every year, team decision 2026-11-14). Review the diff of `point` before committing.",
   "regions": [
     {
       "id": "UZ-AN",
@@ -132,6 +132,7 @@
         "lat": 41.311,
         "lon": 69.28
       },
+      "demo_rotation": "cotton_wheat",
       "point": {
         "lat": 41.347917,
         "lon": 69.409116,
@@ -177,6 +178,7 @@
         "lat": 40.386,
         "lon": 71.786
       },
+      "demo_rotation": "cotton_wheat",
       "point": {
         "lat": 40.347917,
         "lon": 71.786469,
@@ -222,6 +224,7 @@
         "lat": 39.655,
         "lon": 66.976
       },
+      "demo_rotation": "cotton_wheat",
       "point": {
         "lat": 39.647917,
         "lon": 67.060733,
@@ -267,6 +270,7 @@
         "lat": 37.224,
         "lon": 67.278
       },
+      "demo_rotation": "cotton_wheat",
       "point": {
         "lat": 37.21875,
         "lon": 67.248436,
@@ -312,6 +316,7 @@
         "lat": 42.46,
         "lon": 59.61
       },
+      "demo_rotation": "cotton_mono",
       "point": {
         "lat": 42.510417,
         "lon": 59.539192,
@@ -357,6 +362,7 @@
         "lat": 41.55,
         "lon": 60.633
       },
+      "demo_rotation": "cotton_wheat",
       "point": {
         "lat": 41.58125,
         "lon": 60.652167,

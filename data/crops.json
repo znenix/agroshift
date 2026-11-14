@@ -14,7 +14,8 @@
       "sowing": {
         "main": {
           "type": "spring",
-          "tmean_above_c": 14
+          "tmean_above_c": 16,
+          "not_before": "04-15"
         },
         "second": null
       },
@@ -49,9 +50,9 @@
       },
       "ph": {
         "opt_min": 5.8,
-        "opt_max": 8.0,
+        "opt_max": 8.2,
         "abs_min": 5.0,
-        "abs_max": 8.5
+        "abs_max": 9.0
       },
       "root_depth": "deep",
       "n_fixing": false,
@@ -68,7 +69,12 @@
         },
         {
           "fields": [
-            "sowing",
+            "sowing"
+          ],
+          "source": "TODO — ASSUMPTION from local practice (team decision 2026-11-14): sown from 15 April once the 7-day mean reaches 16 °C, so sowing falls mid-April to early May on all demo farms; agronomist to confirm"
+        },
+        {
+          "fields": [
             "season_days"
           ],
           "source": "TODO — approximate Uzbek practice; agronomist to confirm"
@@ -111,7 +117,7 @@
           "fields": [
             "ph"
           ],
-          "source": "TODO — approximate; check against FAO EcoCrop"
+          "source": "TODO — ASSUMPTION from local practice on calcareous soils (team decision 2026-11-14: optimum up to 8.2, absolute limit 8.8–9.0); agronomist to confirm"
         },
         {
           "fields": [
@@ -124,7 +130,8 @@
         }
       ],
       "notes": [
-        "FAO-56 Table 12 gives Kc_mid 1.15–1.20 and Kc_end 0.70–0.50 (lower for a later harvest); midpoints used."
+        "FAO-56 Table 12 gives Kc_mid 1.15–1.20 and Kc_end 0.70–0.50 (lower for a later harvest); midpoints used.",
+        "Sowing: not before 15 April and once the 7-day mean temperature reaches 16 °C (local practice)."
       ],
       "verified": false
     },
@@ -176,9 +183,9 @@
       },
       "ph": {
         "opt_min": 6.0,
-        "opt_max": 8.0,
+        "opt_max": 8.2,
         "abs_min": 5.0,
-        "abs_max": 8.5
+        "abs_max": 8.8
       },
       "root_depth": "medium",
       "n_fixing": false,
@@ -238,7 +245,7 @@
           "fields": [
             "ph"
           ],
-          "source": "TODO — approximate; check against FAO EcoCrop"
+          "source": "TODO — ASSUMPTION from local practice on calcareous soils (team decision 2026-11-14: optimum up to 8.2, absolute limit 8.8–9.0); agronomist to confirm"
         },
         {
           "fields": [
@@ -366,7 +373,7 @@
           "fields": [
             "ph"
           ],
-          "source": "TODO — approximate; check against FAO EcoCrop"
+          "source": "TODO — ASSUMPTION from local practice on calcareous soils (team decision 2026-11-14: optimum up to 8.2, absolute limit 8.8–9.0); agronomist to confirm"
         },
         {
           "fields": [
@@ -824,9 +831,9 @@
       },
       "ph": {
         "opt_min": 5.5,
-        "opt_max": 8.0,
+        "opt_max": 8.2,
         "abs_min": 5.0,
-        "abs_max": 8.5
+        "abs_max": 9.0
       },
       "root_depth": "deep",
       "n_fixing": false,
@@ -886,7 +893,7 @@
           "fields": [
             "ph"
           ],
-          "source": "TODO — approximate; check against FAO EcoCrop"
+          "source": "TODO — ASSUMPTION from local practice on calcareous soils (team decision 2026-11-14: optimum up to 8.2, absolute limit 8.8–9.0); agronomist to confirm"
         },
         {
           "fields": [
@@ -952,9 +959,9 @@
       },
       "ph": {
         "opt_min": 6.5,
-        "opt_max": 8.0,
+        "opt_max": 8.2,
         "abs_min": 6.0,
-        "abs_max": 8.5
+        "abs_max": 9.0
       },
       "root_depth": "deep",
       "n_fixing": true,
@@ -1015,7 +1022,7 @@
           "fields": [
             "ph"
           ],
-          "source": "TODO — approximate; check against FAO EcoCrop"
+          "source": "TODO — ASSUMPTION from local practice on calcareous soils (team decision 2026-11-14: optimum up to 8.2, absolute limit 8.8–9.0); agronomist to confirm"
         },
         {
           "fields": [
@@ -1085,9 +1092,9 @@
       },
       "ph": {
         "opt_min": 6.0,
-        "opt_max": 7.5,
+        "opt_max": 8.2,
         "abs_min": 5.0,
-        "abs_max": 8.5
+        "abs_max": 8.8
       },
       "root_depth": "medium",
       "n_fixing": true,
@@ -1147,7 +1154,7 @@
           "fields": [
             "ph"
           ],
-          "source": "TODO — approximate; check against FAO EcoCrop"
+          "source": "TODO — ASSUMPTION from local practice on calcareous soils (team decision 2026-11-14: optimum up to 8.2, absolute limit 8.8–9.0); agronomist to confirm"
         },
         {
           "fields": [

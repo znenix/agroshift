@@ -35,6 +35,10 @@ Small implementation choices taken without asking (CLAUDE.md §1.2), one line ea
 - **Shorter NDVI record where the download was unfinished.** Fergana, Karakalpakstan, Khorezm and Tashkent fetch MOD13Q1 from 2016-01-01 only, to save time on the slow ORNL service. Samarkand and Surxondaryo, already complete, keep 2006 →. The period is recorded per farm in `data/raw/farms/{id}/meta.json` (`ndvi_start`) and as `ndvi.period` in each farm file; `check-demo` flags it as a WARN, and seasonal curves and trends must use it. Requests stay on the 2006-based grid, so files already on disk are reused.
 - **Climate cells download in parallel with the farm NDVI** (different servers, each at most 3 parallel requests in one process).
 - **crops.json keeps its approximate TODO values** (verified: false); chickpea and sunflower salinity stay empty as an information gap.
+- **The demo follows the satellite.** Each demo farm has a `demo_rotation`, the default farmer answer. Karakalpakstan = cotton every year; the others stay cotton → wheat. The "please check" message stays for real mismatches.
+- **Heat is a warning only, never a blocker.** It is labelled "regional air temperature; irrigated fields are usually cooler", with confidence low. It is shown in crop fit and rotations but not used in the ranking.
+- **Cotton sowing (ASSUMPTION, local practice):** once the 7-day mean reaches 16 °C, and not before 15 April (new optional `not_before` on spring rules). Medians fall on 15–19 April on all six farms. No temperature alone could achieve this: at 18 °C Surxondaryo still sows on 2 April.
+- **pH on calcareous soils (ASSUMPTION, local practice):** cotton, wheat, barley, sorghum, alfalfa and mung bean get an optimum of at least 8.2 and an absolute limit of 8.8–9.0, so pH 7.8–8.2 is not penalised (8.3 scores about 85–88).
 
 ## Phase 1 — data (2026-11-14)
 

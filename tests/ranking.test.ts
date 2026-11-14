@@ -36,7 +36,7 @@ function evaluation(id: string, metrics: Partial<RotationMetrics>, feasible = tr
     feasible,
     exclusions: [],
     metrics: { ...BASE, ...metrics },
-    confidence: { water: "medium", bareDays: "high", erosion: "low", soil: "low", vulnerability: "medium", salinity: null, forage: "low", market: "farmer" },
+    confidence: { water: "medium", bareDays: "high", erosion: "low", soil: "low", vulnerability: "medium", heat: "low", salinity: null, forage: "low", market: "farmer" },
   };
 }
 

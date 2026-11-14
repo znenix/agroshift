@@ -171,6 +171,7 @@ export interface RotationMetrics {
   organicMatter: number;
   /** Longest run of crop seasons from one plant family; Infinity when the cycle never leaves the family. */
   longestFamilyRun: number;
+  /** `mean` covers frost and harvest rain only; `heat` is a low-confidence warning and is not ranked. */
   vulnerability: { heat: number | null; frost: number | null; harvestRain: number | null; mean: number | null };
   salinityLossPct: number | null;
   forage: number;
@@ -191,6 +192,8 @@ export interface RotationEvaluation {
     erosion: Confidence;
     soil: Confidence;
     vulnerability: Confidence;
+    /** Heat from regional air temperature: always low, shown as a warning only. */
+    heat: Confidence;
     salinity: Confidence | null;
     forage: Confidence;
     market: Confidence;
@@ -266,6 +269,7 @@ export function evaluateRotation(
     erosion: "low",
     soil: "low",
     vulnerability: "medium",
+    heat: "low",
     salinity: ctx.soil.ece === null ? null : ctx.soil.eceSource === "soil_test" ? "medium" : "low",
     forage: "low",
     market: "farmer",
@@ -451,7 +455,8 @@ export function evaluateRotation(
   const heat = meanOf(slotShares((crop, season) => heatHit(crop, season, climate)));
   const frost = meanOf(slotShares((crop, season) => frostHit(crop, season, climate)));
   const harvestRain = meanOf(slotShares((_, season) => harvestRainHit(season, climate)));
-  const vulnerabilityParts = [heat, frost, harvestRain].filter((v): v is number => v !== null);
+  // Heat is shown but never ranked: regional air temperature, irrigated fields are usually cooler (team decision 2026-11-14).
+  const vulnerabilityParts = [frost, harvestRain].filter((v): v is number => v !== null);
 
   // Soil and crop-property metrics (indicative).
   const cropSeasons = resolved.flatMap(({ main, second }) => (second === null ? [main] : [main, second]));

@@ -39,6 +39,8 @@ export const regionsSourceSchema = z.object({
         region: regionIdSchema,
         names: localizedNameSchema,
         city: z.object({ names: localizedNameSchema, lat: z.number(), lon: z.number() }),
+        /** Default answer of the demo farmer: the rotation id the demo starts from. */
+        demo_rotation: z.string().regex(/^[a-z_]+$/),
         point: demoPointSchema.nullable(),
       }),
     )

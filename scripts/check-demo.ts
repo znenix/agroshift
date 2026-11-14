@@ -14,12 +14,20 @@ import path from "node:path";
 import process from "node:process";
 import { stat } from "node:fs/promises";
 import { calendarMonthMeans, completeYears, decodeClimate, frostStats } from "@/lib/climate";
-import { CLIMATOLOGY_FIRST_YEAR, CLIMATOLOGY_LAST_YEAR, CROPLAND_CLASSES, RECORD_START, SALINITY_CLASS_ECE } from "@/lib/constants";
+import {
+  CLIMATOLOGY_FIRST_YEAR,
+  CLIMATOLOGY_LAST_YEAR,
+  CROPLAND_CLASSES,
+  NDVI_RECENT_YEARS,
+  RECORD_START,
+  SALINITY_CLASS_ECE,
+} from "@/lib/constants";
 import { calendarContext, cropsFileSchema, indexCrops, type Crop } from "@/lib/crops";
 import { boundariesFileSchema, farmFileSchema, regionsFileSchema, type FarmFile, type RegionsFile, type SourceId } from "@/lib/datafiles";
 import { dayCount, isoToUtcMs, todayIso } from "@/lib/dates";
 import { decodeSeries } from "@/lib/encode";
 import { pointInGeometry, type AreaGeometry } from "@/lib/geo";
+import { expectedCover, satelliteCheck } from "@/lib/ndvi";
 import { effectiveWeights, rankRotations } from "@/lib/ranking";
 import { evaluateRotation, rotationsFileSchema, type FarmerInputs, type Rotation } from "@/lib/rotations";
 import { dailyEt0 } from "@/lib/water";
@@ -43,9 +51,11 @@ interface Check {
 
 const daysAgo = (iso: string) => Math.round((Date.now() - isoToUtcMs(iso)) / 86_400_000);
 
-/** SPEC §10 demo script: current rotation cotton → wheat, priorities water + soil health, water often short. */
+/**
+ * SPEC §10 demo script: priorities water + soil health, water often short. The current rotation is each
+ * farm's `demo_rotation` (data/regions.json; Karakalpakstan follows the satellite: cotton every year).
+ */
 const DEMO_PROFILE = {
-  current: "cotton_wheat",
   weights: { water_saving: 3, soil_health: 3, forage: 0, income_market: 0, low_risk: 0, simplicity: 0 },
   reliability: "often_short",
 } as const;
@@ -64,10 +74,11 @@ type RegionSalinity = RegionsFile["regions"][number]["salinity"];
 
 function checkRotations(
   farm: FarmFile,
+  current: string,
   salinity: RegionSalinity | undefined,
   crops: ReadonlyMap<string, Crop>,
   rotations: readonly Rotation[],
-): Check {
+): Check[] {
   const climate = decodeClimate(farm.climate, farm.point.lat);
   const years = completeYears(climate).filter((y) => y >= CLIMATOLOGY_FIRST_YEAR && y <= CLIMATOLOGY_LAST_YEAR);
   const ece = salinity?.status === "estimated" && salinity.dominant_class !== null ? SALINITY_CLASS_ECE[salinity.dominant_class] : null;
@@ -86,14 +97,37 @@ function checkRotations(
       farmer: DEMO_FARMER,
     }),
   );
-  const ranking = rankRotations(evaluations, effectiveWeights(DEMO_PROFILE.weights, DEMO_PROFILE.reliability), DEMO_PROFILE.current);
+  const ranking = rankRotations(evaluations, effectiveWeights(DEMO_PROFILE.weights, DEMO_PROFILE.reliability), current);
   const shown = (ranking.current === null ? 0 : 1) + ranking.top.length;
   const top = ranking.top.map((r) => `${r.evaluation.id} ${r.score.total ?? "–"}`).join(", ");
-  return {
-    status: shown >= MIN_ROTATIONS_SHOWN ? "PASS" : "FAIL",
-    name: "rotations shown",
-    detail: `${shown} for the demo farmer — current ${DEMO_PROFILE.current} ${ranking.current?.score.total ?? "–"}; ${top}; ${ranking.excluded.length} excluded`,
-  };
+  const checks: Check[] = [
+    {
+      status: shown >= MIN_ROTATIONS_SHOWN ? "PASS" : "FAIL",
+      name: "rotations shown",
+      detail: `${shown} for the demo farmer — current ${current} ${ranking.current?.score.total ?? "–"}; ${top}; ${ranking.excluded.length} excluded`,
+    },
+  ];
+  // What the satellite saw over the last 3 complete years versus the demo farmer's answer (SPEC §5.3).
+  const answer = evaluations.find((e) => e.id === current);
+  const recent = Array.from({ length: NDVI_RECENT_YEARS }, (_, i) => CLIMATOLOGY_LAST_YEAR - NDVI_RECENT_YEARS + 1 + i);
+  const verdict =
+    answer === undefined
+      ? null
+      : satelliteCheck(farm.ndvi.composites, expectedCover(answer.timeline, crops, answer.years.length), answer.years.length, recent);
+  checks.push(
+    verdict === null
+      ? { status: "FAIL", name: "satellite check", detail: `cannot compare (${current} not evaluated)` }
+      : {
+          status: verdict.mismatches.length === 0 ? "PASS" : "WARN",
+          name: "satellite check",
+          detail:
+            `${current} vs MODIS ${recent[0]}–${recent.at(-1)}: ${verdict.agree} agree, ${verdict.disagree} differ` +
+            (verdict.mismatches.length === 0
+              ? " — they agree"
+              : ` — "please check": ${verdict.mismatches.map((m) => `${m.year} ${m.kind} ${m.from.slice(5)}→${m.to.slice(5)}`).join("; ")}`),
+        },
+  );
+  return checks;
 }
 
 function checkClimate(farm: FarmFile, checks: Check[]): void {
@@ -268,9 +302,9 @@ async function main(): Promise<number> {
     });
     const farmFile = await readJsonIfValid(path.join(PUBLIC_DATA_DIR, "farms", `${farm.id}.json`), farmFileSchema);
     checks.push(
-      farmFile === null
-        ? { status: "FAIL", name: "rotations shown", detail: "no valid farm file" }
-        : checkRotations(farmFile, salinity, crops, rotations),
+      ...(farmFile === null
+        ? [{ status: "FAIL", name: "rotations shown", detail: "no valid farm file" } satisfies Check]
+        : checkRotations(farmFile, farm.demo_rotation, salinity, crops, rotations)),
     );
     const worst: Status = checks.some((c) => c.status === "FAIL") ? "FAIL" : checks.some((c) => c.status === "WARN") ? "WARN" : "PASS";
     if (worst === "FAIL") failed++;

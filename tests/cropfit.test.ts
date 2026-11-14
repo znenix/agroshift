@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { completeYears, frostStats } from "@/lib/climate";
-import { calendarContext, cropFit, fitCategory, maasHoffmanLossPct, trapezoid, type SoilConditions } from "@/lib/crops";
+import { calendarContext, cropFit, fitCategory, maasHoffmanLossPct, mainSeason, trapezoid, type SoilConditions } from "@/lib/crops";
 import { crop, syntheticClimate } from "./fixtures/synthetic";
 
 describe("Maas–Hoffman yield loss (SPEC §9)", () => {
@@ -67,6 +67,19 @@ describe("crop fit on a synthetic field", () => {
     const late = cropFit(crop("cotton"), calendarContext(lateFrost), years, frostStats(lateFrost, years), soil(3));
     expect(late.stats.frostShare).toBe(0);
     expect(late.hardBlockers.map((b) => b.key)).toContain("crop.reason.season_too_long");
+  });
+
+  it("treats heat as a warning only, never a blocker (team decision 2026-11-14)", () => {
+    const hot = syntheticClimate({ mean: 18 }); // Tmax peaks at 41 °C, above cotton's 38 °C
+    const fit = cropFit(crop("cotton"), calendarContext(hot), years, frostStats(hot, years), soil(3));
+    expect(fit.warnings.map((w) => w.key)).toEqual(["crop.warning.heat_window"]);
+    expect([...fit.softBlockers, ...fit.hardBlockers].map((b) => b.key)).not.toContain("crop.warning.heat_window");
+  });
+
+  it("never sows cotton before 15 April, even in a warm spring (local practice)", () => {
+    const warm = syntheticClimate({ mean: 20 });
+    const season = mainSeason(crop("cotton"), calendarContext(warm), 2010);
+    expect(warm.dates[season?.sow ?? -1]).toBe("2010-04-15");
   });
 
   it("blocks a frost-sensitive crop whose season runs past the first autumn frost", () => {

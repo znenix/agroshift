@@ -336,6 +336,7 @@ async function buildRegions(farms: readonly FarmFile[]): Promise<RegionsFile> {
       city: f.city.names,
       lat: f.point.lat,
       lon: f.point.lon,
+      demo_rotation: source.demo_farms.find((d) => d.id === f.id)?.demo_rotation ?? "cotton_wheat",
       file: `farms/${f.id}.json`,
     })),
   });
