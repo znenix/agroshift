@@ -119,8 +119,31 @@ export interface FarmAnswers {
   soilTest: SoilTest;
 }
 
+/** Long-term means of the (scenario) climate over the usable years, for the stress-test summary. */
+export interface ScenarioClimate {
+  precipMm: number | null;
+  et0Mm: number | null;
+  heatDays35: number | null;
+  frostFreeDaysMean: number | null;
+  lastSpringSafe: number | null;
+  firstAutumnSafe: number | null;
+}
+
+function climateSummary(annual: readonly AnnualClimate[], frost: FrostStats): ScenarioClimate {
+  const mean = (values: number[]) => (values.length === 0 ? null : Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 10) / 10);
+  return {
+    precipMm: mean(annual.map((a) => a.precipMm)),
+    et0Mm: mean(annual.map((a) => a.et0Mm)),
+    heatDays35: mean(annual.map((a) => a.heatDays35)),
+    frostFreeDaysMean: frost.frostFreeDaysMean,
+    lastSpringSafe: frost.lastSpringSafe,
+    firstAutumnSafe: frost.firstAutumnSafe,
+  };
+}
+
 export interface Analysis {
   scenario: Scenario;
+  climate: ScenarioClimate;
   soil: SoilConditions;
   fits: CropFit[];
   evaluations: RotationEvaluation[];
@@ -172,5 +195,6 @@ export function analyze(
     current.years.length,
     profile.ndvi.recentYears,
   );
-  return { scenario, soil, fits, evaluations, current, ranking, satellite };
+  const annual = scenario === NORMAL_SCENARIO ? profile.annual : annualClimate(climate, et0, profile.years);
+  return { scenario, climate: climateSummary(annual, frost), soil, fits, evaluations, current, ranking, satellite };
 }

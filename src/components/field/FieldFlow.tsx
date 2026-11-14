@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * The /field flow (SPEC §2): choose field → field conditions → your farm → compare rotations. State
+ * The /field flow (SPEC §2): choose field → field conditions → your farm → compare rotations → stress test. State
  * lives in the URL (?farm=&step=) so a step can be linked and the back button works. All engines run
  * in the browser on static files (SPEC §4.3).
  */
@@ -10,6 +10,7 @@ import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useI18n } from "@/components/I18nProvider";
 import { analyze, buildProfile, soilConditions, type FarmAnswers, type FieldProfile } from "@/lib/analysis";
 import { CROPS, ROTATION_TEMPLATES } from "@/lib/catalog";
+import { NORMAL_SCENARIO, type Scenario } from "@/lib/climate";
 import type { RegionsFile } from "@/lib/datafiles";
 import type { MessageKey } from "@/lib/i18n";
 import { fieldIndicators } from "@/lib/indicators";
@@ -18,14 +19,32 @@ import { StepChoose, type DemoFarm } from "./StepChoose";
 import { StepCompare } from "./StepCompare";
 import { StepConditions } from "./StepConditions";
 import { StepFarm } from "./StepFarm";
+import { StepStress } from "./StepStress";
 
 const STEPS: ReadonlyArray<{ n: number; label: MessageKey }> = [
   { n: 1, label: "field.step.choose" },
   { n: 2, label: "field.step.conditions" },
   { n: 3, label: "field.step.farm" },
   { n: 4, label: "field.step.compare" },
+  { n: 5, label: "field.step.stress" },
 ];
-const LAST_STEP = 4;
+const COMPARE_STEP = 4;
+const STRESS_STEP = 5;
+const LAST_STEP = STRESS_STEP;
+/** SPEC §5.11: re-run the engine about 100 ms after the last slider move. */
+const SCENARIO_DEBOUNCE_MS = 100;
+
+function useDebounced<T>(value: T, ms: number): T {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), ms);
+    return () => clearTimeout(id);
+  }, [value, ms]);
+  return debounced;
+}
+
+/** The observed climate is always the NORMAL_SCENARIO object, so the engine can reuse precomputed values. */
+const normalized = (s: Scenario): Scenario => (s.deltaT === 0 && s.rainFactor === 1 ? NORMAL_SCENARIO : s);
 
 type Load<T> = { status: "loading" } | { status: "error"; message: string } | { status: "ready"; value: T };
 
@@ -106,9 +125,18 @@ export function FieldFlow() {
   const soil = useMemo(() => (profile === null || answers === null ? null : soilConditions(profile, answers.soilTest)), [profile, answers]);
   const indicators = useMemo(() => (profile === null || soil === null ? [] : fieldIndicators(profile, soil)), [profile, soil]);
   const analysis = useMemo(
-    () => (profile === null || deferredAnswers === null || step < LAST_STEP ? null : analyze(profile, CROPS, ROTATION_TEMPLATES, deferredAnswers)),
+    () => (profile === null || deferredAnswers === null || step < COMPARE_STEP ? null : analyze(profile, CROPS, ROTATION_TEMPLATES, deferredAnswers)),
     [profile, deferredAnswers, step],
   );
+
+  const [scenario, setScenario] = useState<Scenario>(NORMAL_SCENARIO);
+  const debouncedScenario = useDebounced(scenario, SCENARIO_DEBOUNCE_MS);
+  const stressed = useMemo(() => {
+    const s = normalized(debouncedScenario);
+    if (analysis === null || profile === null || deferredAnswers === null || step !== STRESS_STEP) return null;
+    return s === NORMAL_SCENARIO ? analysis : analyze(profile, CROPS, ROTATION_TEMPLATES, deferredAnswers, s);
+  }, [analysis, profile, deferredAnswers, debouncedScenario, step]);
+  const scenarioPending = scenario.deltaT !== debouncedScenario.deltaT || scenario.rainFactor !== debouncedScenario.rainFactor;
 
   const go = (n: number) => navigate({ farm: demoFarm?.id ?? null, step: n });
 
@@ -150,7 +178,13 @@ export function FieldFlow() {
         <>
           {step === 2 && <StepConditions profile={profile} indicators={indicators} soil={soil} />}
           {step === 3 && <StepFarm answers={answers} onChange={setAnswers} />}
-          {step === 4 && (analysis === null ? <Skeleton label={t("field.loading")} /> : <StepCompare profile={profile} analysis={analysis} />)}
+          {step === COMPARE_STEP && (analysis === null ? <Skeleton label={t("field.loading")} /> : <StepCompare profile={profile} analysis={analysis} />)}
+          {step === STRESS_STEP &&
+            (analysis === null ? (
+              <Skeleton label={t("field.loading")} />
+            ) : (
+              <StepStress profile={profile} normal={analysis} result={stressed ?? analysis} pending={scenarioPending} scenario={scenario} onScenario={setScenario} />
+            ))}
         </>
       )}
 

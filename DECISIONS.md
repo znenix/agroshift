@@ -160,3 +160,12 @@ Small implementation choices taken without asking (CLAUDE.md §1.2), one line ea
 - **Timeline.** One row per cycle year inside each card (rather than one long row per rotation), so 6-year rotations stay readable; bare soil hatched; perennials drawn lighter outside their active season.
 - **Charts.** Units are in chart titles, not on the axis ticks; lines carry short direct labels (Max, Min, ET0) plus a legend; every chart has a table view.
 - **Mobile check.** Headless Edge enforces a minimum window width of about 500 px, so the layout was checked at 500 px; a true 360 px check needs device emulation (to do before the demo).
+
+## Phase 4 — stress test (2026-11-14)
+
+- **Step 5 "Stress test"** (SPEC §5.11): presets Normal / Dry year (rain −30 %) / Hot (+2 °C) and sliders ΔT 0…+4 °C (0.5) and Δrain −30…+30 % (5). The engine re-runs in the browser about 100 ms after the last change (measured 30–60 ms per run on a real farm).
+- **What it shows.** The ranking of all feasible rotations in the scenario: score and dry-year water, each with its change from the observed climate, and the rank move. Also: rotations that become infeasible, a climate table (observed vs scenario) and the sowing and harvest shifts of the farmer's main crops.
+- **Rank animation.** FLIP with the Web Animations API: rows stay in rank order in the DOM, so screen readers read the new order. It is off under `prefers-reduced-motion`.
+- **While recalculating,** the last computed scenario stays on screen (dimmed) instead of flashing back to the observed climate.
+- **Scenario state** lives in memory for the session and is not in the URL.
+- **Observation, not tuned.** At Karakalpakstan (about 106 mm of rain a year) the dry-year preset barely changes the irrigation need, because rain is a tiny share of the water balance. Hot +2 °C raises the dry-year need by about 700–1,300 m³/ha. With neutral priorities the order of rotations does not change.
