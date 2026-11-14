@@ -1,0 +1,18 @@
+{
+  "app.name": "AgroShift UZ",
+  "app.description": "Helps farmers in Uzbekistan compare crop rotations for their own field using NASA Earth observations, local soil information, crop characteristics and their own priorities.",
+  "a11y.skip_to_content": "Skip to main content",
+  "nav.label": "Main navigation",
+  "nav.home": "Home",
+  "nav.field": "My field",
+  "nav.about": "About",
+  "lang.label": "Language",
+  "common.disclaimer": "This tool supports, not replaces, your judgment and your agronomist's advice.",
+  "common.under_construction": "This page is under construction.",
+  "landing.title": "Compare crop rotations for your field",
+  "landing.lead": "AgroShift UZ uses NASA Earth observations, local soil information, crop characteristics and your own priorities to compare rotations for farms in Uzbekistan.",
+  "field.title": "Your field",
+  "about.title": "About AgroShift UZ",
+  "footer.event": "A NASA Space Apps Challenge 2026 project (challenge: Field Shift).",
+  "footer.not_endorsed": "Not affiliated with or endorsed by NASA."
+}

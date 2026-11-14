@@ -1,0 +1,9 @@
+# Normalise line endings: the team develops on Windows/macOS, Vercel builds on Linux.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary
+*.tif binary
+*.tiff binary
+*.zip binary

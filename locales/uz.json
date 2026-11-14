@@ -1,0 +1,18 @@
+{
+  "app.name": "AgroShift UZ",
+  "app.description": "Oʻzbekiston fermerlariga NASA Yer kuzatuvlari, mahalliy tuproq maʼlumotlari, ekinlar xususiyatlari va oʻz ustuvorliklari asosida dalasi uchun almashlab ekish tizimlarini solishtirishga yordam beradi.",
+  "a11y.skip_to_content": "Asosiy mazmunga oʻtish",
+  "nav.label": "Asosiy menyu",
+  "nav.home": "Bosh sahifa",
+  "nav.field": "Mening dalam",
+  "nav.about": "Loyiha haqida",
+  "lang.label": "Til",
+  "common.disclaimer": "Bu vosita qaror qabul qilishda yordam beradi, lekin sizning fikringiz va agronomingiz maslahatining oʻrnini bosmaydi.",
+  "common.under_construction": "Bu sahifa ishlab chiqilmoqda.",
+  "landing.title": "Dalangiz uchun almashlab ekish tizimlarini solishtiring",
+  "landing.lead": "AgroShift UZ Oʻzbekiston xoʻjaliklari uchun almashlab ekish tizimlarini NASA Yer kuzatuvlari, mahalliy tuproq maʼlumotlari, ekinlar xususiyatlari va sizning ustuvorliklaringiz asosida solishtiradi.",
+  "field.title": "Sizning dalangiz",
+  "about.title": "AgroShift UZ haqida",
+  "footer.event": "NASA Space Apps Challenge 2026 loyihasi («Field Shift» topshirigʻi).",
+  "footer.not_endorsed": "NASA bilan bogʻliq emas va NASA tomonidan maʼqullanmagan."
+}
