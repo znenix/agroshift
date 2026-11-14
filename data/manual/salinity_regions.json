@@ -1,5 +1,5 @@
 {
-  "about": "Share of irrigated land by salinity class, per region (SPEC §3.4). TEAM TASK: fill each region from a published land-reclamation report and cite it in `source` (title, publisher, year, table/page). Leave values null when unknown: the app then shows 'Salinity unknown — get a soil test' and marks salt-sensitive crops 'needs soil test'. Never enter a value without a source. A farmer's soil test (EC, dS/m) always overrides these values.",
+  "about": "Salinity of irrigated land per region (SPEC §3.4). Fill shares_pct from a published land-reclamation report, or — when the source gives no shares per class — set dominant_class as the team's regional estimate; always cite the source in `source`. Leave values null when unknown: the app then shows 'Salinity unknown — get a soil test'. Never enter a value without a source. A farmer's soil test (EC, dS/m) always overrides these values.",
   "classes": [
     "none",
     "slight",
@@ -16,6 +16,7 @@
         "moderate": null,
         "strong": null
       },
+      "dominant_class": null,
       "source": null
     },
     {
@@ -27,18 +28,20 @@
         "moderate": null,
         "strong": null
       },
+      "dominant_class": null,
       "source": null
     },
     {
       "region": "UZ-FA",
-      "year": null,
+      "year": 1994,
       "shares_pct": {
         "none": null,
         "slight": null,
         "moderate": null,
         "strong": null
       },
-      "source": null
+      "dominant_class": "slight",
+      "source": "FAO (1997). Irrigation in the countries of the former Soviet Union in figures. FAO Water Report 15, Uzbekistan profile (https://www.fao.org/4/w6240e/w6240e20.htm): in 1994, in the upper reaches of the Syr Darya and Amu Darya, less than 10 % of the land was saline or highly saline. Dominant class \"slight\" is the team's regional estimate."
     },
     {
       "region": "UZ-JI",
@@ -49,6 +52,7 @@
         "moderate": null,
         "strong": null
       },
+      "dominant_class": null,
       "source": null
     },
     {
@@ -60,6 +64,7 @@
         "moderate": null,
         "strong": null
       },
+      "dominant_class": null,
       "source": null
     },
     {
@@ -71,6 +76,7 @@
         "moderate": null,
         "strong": null
       },
+      "dominant_class": null,
       "source": null
     },
     {
@@ -82,29 +88,32 @@
         "moderate": null,
         "strong": null
       },
+      "dominant_class": null,
       "source": null
     },
     {
       "region": "UZ-QR",
-      "year": null,
+      "year": 1994,
       "shares_pct": {
         "none": null,
         "slight": null,
         "moderate": null,
         "strong": null
       },
-      "source": null
+      "dominant_class": "moderate",
+      "source": "FAO (1997). Irrigation in the countries of the former Soviet Union in figures. FAO Water Report 15, Uzbekistan profile (https://www.fao.org/4/w6240e/w6240e20.htm): in 1994, downstream (especially in Karakalpakstan) about 95 % of the land was saline, highly saline or very highly saline. Dominant class \"moderate\" is the team's regional estimate."
     },
     {
       "region": "UZ-SA",
-      "year": null,
+      "year": 2014,
       "shares_pct": {
         "none": null,
         "slight": null,
         "moderate": null,
         "strong": null
       },
-      "source": null
+      "dominant_class": "slight",
+      "source": "Kulmatov, R. (2014). Problems of sustainable use and management of water and land resources in Uzbekistan. Journal of Water Resource and Protection, 6(1), 35–42. https://doi.org/10.4236/jwarp.2014.61006: favourable ameliorative conditions in Samarkand region (5.4 %). FAO (1997). Irrigation in the countries of the former Soviet Union in figures. FAO Water Report 15, Uzbekistan profile (https://www.fao.org/4/w6240e/w6240e20.htm): upstream, less than 10 % of the land is saline or highly saline. Dominant class \"slight\" is the team's regional estimate."
     },
     {
       "region": "UZ-SI",
@@ -115,18 +124,20 @@
         "moderate": null,
         "strong": null
       },
+      "dominant_class": null,
       "source": null
     },
     {
       "region": "UZ-SU",
-      "year": null,
+      "year": 1994,
       "shares_pct": {
         "none": null,
         "slight": null,
         "moderate": null,
         "strong": null
       },
-      "source": null
+      "dominant_class": "slight",
+      "source": "FAO (1997). Irrigation in the countries of the former Soviet Union in figures. FAO Water Report 15, Uzbekistan profile (https://www.fao.org/4/w6240e/w6240e20.htm): in 1994, in the upper reaches of the Syr Darya and Amu Darya, less than 10 % of the land was saline or highly saline. Dominant class \"slight\" is the team's regional estimate."
     },
     {
       "region": "UZ-TK",
@@ -137,29 +148,32 @@
         "moderate": null,
         "strong": null
       },
+      "dominant_class": null,
       "source": null
     },
     {
       "region": "UZ-TO",
-      "year": null,
+      "year": 2014,
       "shares_pct": {
         "none": null,
         "slight": null,
         "moderate": null,
         "strong": null
       },
-      "source": null
+      "dominant_class": "slight",
+      "source": "Kulmatov, R. (2014). Problems of sustainable use and management of water and land resources in Uzbekistan. Journal of Water Resource and Protection, 6(1), 35–42. https://doi.org/10.4236/jwarp.2014.61006: favourable ameliorative conditions in Tashkent region (3.6 %). FAO (1997). Irrigation in the countries of the former Soviet Union in figures. FAO Water Report 15, Uzbekistan profile (https://www.fao.org/4/w6240e/w6240e20.htm): upstream, less than 10 % of the land is saline or highly saline. Dominant class \"slight\" is the team's regional estimate."
     },
     {
       "region": "UZ-XO",
-      "year": null,
+      "year": 1994,
       "shares_pct": {
         "none": null,
         "slight": null,
         "moderate": null,
         "strong": null
       },
-      "source": null
+      "dominant_class": "moderate",
+      "source": "FAO (1997). Irrigation in the countries of the former Soviet Union in figures. FAO Water Report 15, Uzbekistan profile (https://www.fao.org/4/w6240e/w6240e20.htm): in 1994, about 95 % of the land downstream on the Amu Darya was saline, highly saline or very highly saline. Dominant class \"moderate\" is the team's regional estimate."
     }
   ]
 }

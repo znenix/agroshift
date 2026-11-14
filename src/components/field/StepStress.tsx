@@ -156,18 +156,18 @@ export function StepStress({
                 data-id={id}
                 className={`grid grid-cols-[2.5rem_1fr] items-center gap-x-3 gap-y-1 rounded-lg border bg-white px-3 py-2 sm:grid-cols-[2.5rem_1fr_auto_auto] ${isCurrent ? "border-2 border-forest-900" : "border-sand-300"}`}
               >
-                <span className="row-span-2 text-2xl font-bold tabular-nums sm:row-span-1">{i + 1}</span>
+                <span className="row-span-3 self-start text-2xl font-bold tabular-nums sm:row-span-1 sm:self-center">{i + 1}</span>
                 <span>
                   <span className="font-medium">{rotationName(r.evaluation.years, locale)}</span>
                   {isCurrent && <span className="ml-2 text-xs font-semibold text-ink-muted uppercase">{t("compare.current")}</span>}
                   <RankMove move={move} />
                 </span>
-                <span className="text-sm tabular-nums">
+                <span className="col-start-2 text-sm tabular-nums sm:col-start-auto">
                   <span className="text-lg font-semibold">{r.score.total === null ? "–" : Math.round(r.score.total)}</span>
                   <span className="text-ink-muted"> / 100</span>
                   {scoreDelta !== null && Math.abs(scoreDelta) >= 0.05 && <span className="ml-1 text-ink-muted">({signed(scoreDelta, locale, 1)})</span>}
                 </span>
-                <span className="text-sm tabular-nums">
+                <span className="col-start-2 text-sm tabular-nums sm:col-start-auto">
                   {water === null ? t("value.unknown") : t("value.m3", { value: formatNumber(Math.round(water / 100) * 100, locale) })}
                   {waterDelta !== null && Math.abs(waterDelta) >= 50 && (
                     <span className="ml-1 text-ink-muted">({signed(Math.round(waterDelta / 10) * 10, locale)})</span>

@@ -63,6 +63,8 @@ export const salinitySourceSchema = z.object({
       region: regionIdSchema,
       year: z.number().int().nullable(),
       shares_pct: z.object({ none: shareSchema, slight: shareSchema, moderate: shareSchema, strong: shareSchema }),
+      /** Dominant class when the source gives no shares per class (team estimate from the cited source). */
+      dominant_class: z.enum(["none", "slight", "moderate", "strong"]).nullable().optional(),
       source: z.string().min(1).nullable(),
     }),
   ),

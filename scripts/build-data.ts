@@ -315,9 +315,11 @@ async function buildRegions(farms: readonly FarmFile[]): Promise<RegionsFile> {
     regions: source.regions.map((region) => {
       const entry = salinity.regions.find((s) => s.region === region.id);
       const shares = entry?.shares_pct ?? { none: null, slight: null, moderate: null, strong: null };
-      const known = entry !== undefined && entry.source !== null && Object.values(shares).every((v) => v !== null);
-      let dominant: "none" | "slight" | "moderate" | "strong" | null = null;
-      if (known) {
+      const allShares = Object.values(shares).every((v) => v !== null);
+      const explicit = entry?.dominant_class ?? null;
+      const known = entry !== undefined && entry.source !== null && (allShares || explicit !== null);
+      let dominant: "none" | "slight" | "moderate" | "strong" | null = known ? explicit : null;
+      if (known && dominant === null) {
         const ranked = (["none", "slight", "moderate", "strong"] as const).map((cls) => ({ cls, share: shares[cls] ?? -1 }));
         dominant = ranked.reduce((best, next) => (next.share > best.share ? next : best)).cls;
       }

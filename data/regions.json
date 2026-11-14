@@ -132,7 +132,7 @@
         "lat": 41.311,
         "lon": 69.28
       },
-      "demo_rotation": "cotton_wheat",
+      "demo_rotation": "wheat_silage",
       "point": {
         "lat": 41.347917,
         "lon": 69.409116,
@@ -178,7 +178,7 @@
         "lat": 40.386,
         "lon": 71.786
       },
-      "demo_rotation": "cotton_wheat",
+      "demo_rotation": "wheat_silage",
       "point": {
         "lat": 40.347917,
         "lon": 71.786469,
@@ -224,7 +224,7 @@
         "lat": 39.655,
         "lon": 66.976
       },
-      "demo_rotation": "cotton_wheat",
+      "demo_rotation": "wheat_silage",
       "point": {
         "lat": 39.647917,
         "lon": 67.060733,

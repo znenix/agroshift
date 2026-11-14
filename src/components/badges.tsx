@@ -28,12 +28,15 @@ export function SourceChip({
   refs,
   estimated = false,
   label: labelOverride,
+  title: titleOverride,
 }: {
   source: ChipSource;
   refs: readonly SourceRef[];
   estimated?: boolean;
   /** Replaces the source's short label (e.g. heat: "regional air temperature …"). */
   label?: string;
+  /** Replaces the tooltip (e.g. the cited report of a regional estimate). */
+  title?: string;
 }) {
   const { t } = useI18n();
   // The field's own reference (with its retrieval date), else the standard description of the source.
@@ -41,7 +44,7 @@ export function SourceChip({
   const ref = refs.find((r) => r.id === source) ?? (known.success && CHIP_KEYS[known.data] === undefined ? sourceRef(known.data, null) : undefined);
   const keys = CHIP_KEYS[source];
   const label = labelOverride ?? (keys !== undefined ? t(keys.label) : known.success ? t(`source.name.${known.data}`) : (ref?.label ?? source));
-  const title = ref?.citation ?? (keys === undefined ? undefined : t(keys.title));
+  const title = titleOverride ?? ref?.citation ?? (keys === undefined ? undefined : t(keys.title));
   return (
     <span
       title={title}

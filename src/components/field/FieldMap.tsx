@@ -21,7 +21,14 @@ const STYLES: ReadonlyArray<string | StyleSpecification> = [
   "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
   { version: 8, sources: {}, layers: [{ id: "background", type: "background", paint: { "background-color": "#f3ecdc" } }] },
 ];
-const UZ_VIEW = { longitude: 64.5, latitude: 41.4, zoom: 4.6 };
+/** Uzbekistan's bounding box: the map fits it at any width, so no region is cut off on a phone. */
+const UZ_VIEW = {
+  bounds: [
+    [55.9, 37.1],
+    [73.2, 45.6],
+  ] as [[number, number], [number, number]],
+  fitBoundsOptions: { padding: 12 },
+};
 
 // The worker is served from our own origin (scripts/copy-maplibre-worker.mjs copies it before dev/build).
 setWorkerUrl("/maplibre/maplibre-gl-worker.mjs");

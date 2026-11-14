@@ -182,7 +182,7 @@ function RotationCard({ ranked, label, analysis, profile }: { ranked: RankedRota
       </CardSection>
 
       <CardSection title={t("compare.evidence")}>
-        <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+        <dl className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-3 gap-y-1 text-sm sm:grid-cols-[auto_1fr] [&>dd]:text-right sm:[&>dd]:text-left">
           <dt className="text-ink-muted">{t("metric.water_dry")}</dt>
           <dd className="font-medium tabular-nums">
             {m.water.dryYearM3PerHa === null ? t("value.unknown") : t("value.m3", { value: num(Math.round(m.water.dryYearM3PerHa / 100) * 100) })}

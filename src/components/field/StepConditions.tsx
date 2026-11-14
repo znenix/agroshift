@@ -302,6 +302,9 @@ function IndicatorGrid({ indicators, profile }: { indicators: readonly Indicator
               {ind.unit !== null && ind.value !== null && <span className="ml-1 text-sm font-normal text-ink-muted">{t(ind.unit)}</span>}
             </p>
             <p className="text-sm">{t(ind.explanation, ind.params)}</p>
+            {ind.id === "salinity" && ind.source === "team-salinity" && profile.salinity?.source != null && (
+              <p className="text-xs text-ink-muted">{profile.salinity.source}</p>
+            )}
             <div className="mt-auto flex flex-wrap items-center gap-2">
               {ind.source !== null && <SourceChip source={ind.source} refs={profile.farm.sources} label={ind.id === "heat" ? t("source.heat_label") : undefined} />}
               {estimated && <EstimatedMark />}

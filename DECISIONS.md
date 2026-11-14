@@ -192,3 +192,17 @@ Small implementation choices taken without asking (CLAUDE.md §1.2), one line ea
   - Russian plurals.
 - **Source names on chips** are translated (`source.name.*`); the citations (tooltips, About page) stay in English, as published.
 - **Russian sentences ending in a date** have no final period, because abbreviated months already end with one ("6 окт.").
+
+## Team decisions — 2026-11-15
+
+- **Cotton season ~170 days** (ASSUMPTION, local practice): mid-April sowing to defoliation and harvest in Sept–Oct (crops.json; was 175).
+  - Karakalpakstan "cotton every year" still shows "please check": MODIS sees the field green 30 Sep → 16 Nov in 2023 and 2025, after the modelled cotton season. Not tuned.
+- **Demo answers follow the satellite:** Tashkent, Fergana and Samarkand use `wheat_silage`, the existing "winter wheat + summer second crop every year" template. The satellite check now agrees on all three.
+- **Regional salinity** (`data/manual/salinity_regions.json`): dominant class only, marked estimated and regional; a soil test overrides it. No shares per class are entered, because the sources give none.
+  - The template and build-data accept an explicit `dominant_class` when a source is given.
+  - Karakalpakstan and Khorezm: moderate. Source: FAO Water Report 15 (1997), checked — about 95 % of downstream land saline or worse in 1994.
+  - Tashkent region and Samarkand: slight. Sources: Kulmatov (2014), doi:10.4236/jwarp.2014.61006, checked (3.6 % and 5.4 %), plus FAO (upstream < 10 %).
+  - Fergana and Surxondaryo: slight. Source: FAO (upstream < 10 %).
+  - The other 8 regions stay unknown.
+  - **Left out:** the ScienceDirect article S0378377421007216 resolves (Crossref) to Khasanov et al. (2022), *Agricultural Water Management*, doi:10.1016/j.agwat.2021.107444, about **Syrdarya Province**. The 78 % / 95 % figures for Karakalpakstan and Khorezm could not be verified there (paywalled), so it is not cited in the app; the team can add it after checking.
+- **360 px phone layout** checked with device emulation (no horizontal overflow on any step or on /about). The map fits Uzbekistan's bounds instead of a fixed zoom; the stress-test rows and card evidence stack on narrow screens.

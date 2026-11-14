@@ -47,7 +47,7 @@ describe("rotation timelines (SPEC §5.8, §9)", () => {
   it("leaves the field bare much longer under cotton monoculture than with wheat + mung bean", () => {
     const mono = evaluateRotation(template("cotton_mono"), ctx);
     const double = evaluateRotation({ id: "wheat_mung", years: [{ main: "winter_wheat", second: "mung_bean" }] }, ctx);
-    expect(mono.metrics.bareDaysPerYear).toBe(365 - 175);
+    expect(mono.metrics.bareDaysPerYear).toBe(365 - 170);
     expect(double.metrics.bareDaysPerYear).toBeLessThan(60);
     expect(mono.metrics.longestFamilyRun).toBe(Number.POSITIVE_INFINITY);
     expect(double.metrics.nFixingShare).toBe(0.5);
