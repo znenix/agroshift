@@ -160,6 +160,15 @@ export const gridFileSchema = z.object({
 });
 export type GridFile = z.infer<typeof gridFileSchema>;
 
+/** public/data/meta.json: what the built data was made from (POWER API versions, access dates per source). */
+export const dataMetaSchema = z.object({
+  version: z.literal(1),
+  built: isoDate,
+  power_api_versions: z.array(z.string()),
+  retrieved: z.array(z.object({ id: sourceIdSchema, from: isoDate, to: isoDate })),
+});
+export type DataMeta = z.infer<typeof dataMetaSchema>;
+
 export const salinityClassSchema = z.enum(["none", "slight", "moderate", "strong"]);
 const share = z.number().nullable();
 

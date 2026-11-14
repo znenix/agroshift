@@ -51,6 +51,8 @@ const eslintConfig = defineConfig([
     // Data, not code:
     "data/raw/**",
     "public/data/**",
+    // Vendored at build time from node_modules (scripts/copy-maplibre-worker.mjs):
+    "public/maplibre/**",
   ]),
 ]);
 

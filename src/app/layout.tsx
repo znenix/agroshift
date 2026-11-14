@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getServerI18n } from "@/app/i18n-server";
 import { I18nProvider } from "@/components/I18nProvider";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -38,6 +39,12 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
           </main>
           <footer className="border-t border-sand-300 bg-sand-100">
             <div className="mx-auto max-w-6xl space-y-1 px-4 py-6 text-sm text-ink-muted">
+              <p>
+                {t("footer.data")}{" "}
+                <Link href="/about#sources" className="text-water-700 underline underline-offset-2">
+                  {t("footer.sources_link")}
+                </Link>
+              </p>
               <p>{t("footer.event")}</p>
               <p>{t("footer.not_endorsed")}</p>
             </div>

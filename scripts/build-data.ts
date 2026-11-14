@@ -33,12 +33,16 @@ import {
   CLIMATE_ENCODING,
   cellFileSchema,
   cellIndicatorsSchema,
+  dataMetaSchema,
   farmFileSchema,
   gridFileSchema,
   regionsFileSchema,
+  type CellFile,
   type ClimateData,
+  type DataMeta,
   type FarmFile,
   type RegionsFile,
+  type SourceId,
   type SourceRef,
 } from "@/lib/datafiles";
 import { sourceRef } from "@/lib/datasources";
@@ -342,7 +346,7 @@ async function buildRegions(farms: readonly FarmFile[]): Promise<RegionsFile> {
   });
 }
 
-async function buildBoundaries(): Promise<{ country: AreaGeometry } | null> {
+async function buildBoundaries(): Promise<{ country: AreaGeometry; source: SourceRef } | null> {
   const dir = path.join(RAW_DIR, "boundaries");
   const adm0 = await readJsonIfValid(path.join(dir, "geoBoundaries-UZB-ADM0.geojson"), boundaryCollectionSchema);
   const adm1 = await readJsonIfValid(path.join(dir, "geoBoundaries-UZB-ADM1.geojson"), boundaryCollectionSchema);
@@ -362,7 +366,7 @@ async function buildBoundaries(): Promise<{ country: AreaGeometry } | null> {
     source: sourceRef("geoboundaries", await fileDate(path.join(dir, "geoBoundaries-UZB-ADM0.geojson"))),
   });
   await writeJsonAtomic(path.join(PUBLIC_DATA_DIR, "boundaries.json"), file);
-  return { country };
+  return { country, source: file.source };
 }
 
 type CellIndicators = z.infer<typeof cellIndicatorsSchema>;
@@ -389,9 +393,10 @@ function cellIndicators(data: ClimateData, lat: number): CellIndicators | null {
   };
 }
 
-async function buildCells(country: AreaGeometry | null): Promise<number> {
+async function buildCells(country: AreaGeometry | null): Promise<{ count: number; files: CellFile[] }> {
   const rawCells = (await listFiles(path.join(RAW_DIR, "cells"))).sort();
   const built: Array<{ id: string; lat: number; lon: number; indicators: CellIndicators | null }> = [];
+  const files: CellFile[] = [];
   for (const dir of rawCells) {
     const id = path.basename(dir);
     const power = await loadPower(dir);
@@ -415,6 +420,7 @@ async function buildCells(country: AreaGeometry | null): Promise<number> {
     });
     if (file.climate.cell.id !== id) throw new Error(`cell ${id} resolves to ${file.climate.cell.id}`);
     await writeJsonAtomic(path.join(PUBLIC_DATA_DIR, "cells", `${id}.json`), file);
+    files.push(file);
     built.push({ id, lat: cell.lat, lon: cell.lon, indicators: cellIndicators(file.climate, cell.lat) });
   }
   if (country !== null && built.length > 0) {
@@ -429,7 +435,25 @@ async function buildCells(country: AreaGeometry | null): Promise<number> {
     cells: built,
   });
   await writeJsonAtomic(path.join(PUBLIC_DATA_DIR, "grid.json"), grid);
-  return built.length;
+  return { count: built.length, files };
+}
+
+/** meta.json: POWER API versions and the access-date range of every source (About page, SPEC §6 attribution). */
+function buildMeta(farms: readonly FarmFile[], cells: readonly CellFile[], extra: readonly SourceRef[]): DataMeta {
+  const refs: SourceRef[] = [...farms.flatMap((f) => f.sources), ...cells.flatMap((c) => c.sources), ...extra];
+  const ranges = new Map<SourceId, { from: string; to: string }>();
+  for (const ref of refs) {
+    if (ref.retrieved === null) continue;
+    const range = ranges.get(ref.id);
+    ranges.set(ref.id, range === undefined ? { from: ref.retrieved, to: ref.retrieved } : { from: ref.retrieved < range.from ? ref.retrieved : range.from, to: ref.retrieved > range.to ? ref.retrieved : range.to });
+  }
+  const versions = [...new Set([...farms, ...cells].map((x) => x.climate.power.api_version))].sort();
+  return dataMetaSchema.parse({
+    version: 1,
+    built: new Date().toISOString().slice(0, 10),
+    power_api_versions: versions,
+    retrieved: [...ranges.entries()].map(([id, range]) => ({ id, ...range })),
+  });
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
@@ -458,7 +482,8 @@ async function main(): Promise<number> {
   const unknownSalinity = regions.regions.filter((r) => r.salinity.status === "unknown").length;
   if (unknownSalinity > 0) problems.push(`salinity: ${unknownSalinity}/14 regions unknown (team task: data/manual/salinity_regions.json)`);
 
-  const cells = await buildCells(boundaries?.country ?? null);
+  const { count: cells, files: cellFiles } = await buildCells(boundaries?.country ?? null);
+  await writeJsonAtomic(path.join(PUBLIC_DATA_DIR, "meta.json"), buildMeta(farms, cellFiles, boundaries === null ? [] : [boundaries.source]));
   log("build-data", `${farms.length} demo farms, ${cells} cells, regions and boundaries written to ${relative(PUBLIC_DATA_DIR)} in ${((Date.now() - started) / 1000).toFixed(1)} s`);
   log("build-data", `rule used: years/months with > ${MAX_MISSING_SHARE * 100} % missing days are flagged and excluded`);
 
