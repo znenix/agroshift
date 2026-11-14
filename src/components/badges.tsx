@@ -40,7 +40,7 @@ export function SourceChip({
   const known = sourceIdSchema.safeParse(source);
   const ref = refs.find((r) => r.id === source) ?? (known.success && CHIP_KEYS[known.data] === undefined ? sourceRef(known.data, null) : undefined);
   const keys = CHIP_KEYS[source];
-  const label = labelOverride ?? ref?.label ?? (keys === undefined ? source : t(keys.label));
+  const label = labelOverride ?? (keys !== undefined ? t(keys.label) : known.success ? t(`source.name.${known.data}`) : (ref?.label ?? source));
   const title = ref?.citation ?? (keys === undefined ? undefined : t(keys.title));
   return (
     <span

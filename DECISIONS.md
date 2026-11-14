@@ -178,3 +178,17 @@ Small implementation choices taken without asking (CLAUDE.md §1.2), one line ea
 - **Satellite check gives no verdict below 8 judged composites** (ASSUMPTION). This fixes a silent "agrees" when there was no data.
 - **MapLibre 6 worker** is copied to public/maplibre/ before dev/build (`scripts/copy-maplibre-worker.mjs`), because Turbopack does not emit it.
 - **Map layer classes:** heat days 10/30/60/90 and frost-free days 180/200/220/240 (ASSUMPTION); aridity uses the UNEP classes; rain trend is grey unless p < 0.05.
+
+## Phase 5 — about, i18n, deploy prep (2026-11-14)
+
+- **Citations checked against the sources** (doi.org and the providers' pages, 2026-11-14), not written from memory.
+  - MOD13Q1, MCD12Q1, TESViS (doi:10.3334/ORNLDAAC/1600), SoilGrids, geoBoundaries, Copernicus DEM (doi:10.5270/ESA-c5d3d65).
+  - Maas & Hoffman, Sen, Mann.
+  - NASA POWER's reference is quoted verbatim from its referencing page.
+- **POWER data reference.** The "Daily vX version on YYYY/MM/DD" line is filled from `public/data/meta.json`, which build-data writes (API versions and access dates per source).
+- **About-page numbers** (missing-day rule, efficiencies, percentile, NDVI thresholds, fit categories) are read from `src/lib/constants.ts`, so the text cannot drift from the code.
+- **uz/ru texts drafted with AI**, complete for all keys. `docs/i18n-proofread.md` (`node scripts/i18n-proofread.mjs`) is the side-by-side list for the native speakers, with open points:
+  - USDA texture names versus the Kachinsky classification.
+  - Russian plurals.
+- **Source names on chips** are translated (`source.name.*`); the citations (tooltips, About page) stay in English, as published.
+- **Russian sentences ending in a date** have no final period, because abbreviated months already end with one ("6 окт.").

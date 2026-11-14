@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { useI18n } from "@/components/I18nProvider";
 import { powerDataReference } from "@/lib/attributions";
 import { dataMetaSchema, type DataMeta } from "@/lib/datafiles";
-import { sourceRef } from "@/lib/datasources";
 import { fetchStatic } from "@/lib/staticdata";
 
 export function DataVersions() {
@@ -30,7 +29,7 @@ export function DataVersions() {
       <ul className="space-y-0.5">
         {meta.retrieved.map((r) => (
           <li key={r.id}>
-            {sourceRef(r.id, null).label}: {r.from === r.to ? t("about.accessed_on", { date: r.from }) : t("about.accessed_between", { from: r.from, to: r.to })}
+            {t(`source.name.${r.id}`)}: {r.from === r.to ? t("about.accessed_on", { date: r.from }) : t("about.accessed_between", { from: r.from, to: r.to })}
           </li>
         ))}
       </ul>

@@ -270,8 +270,8 @@ function ClimateTable({ normal, scenario }: { normal: ScenarioClimate; scenario:
   const num = (v: number | null, unit: string) => (v === null ? t("value.unknown") : `${formatNumber(Math.round(v), locale)} ${unit}`);
   const day = (v: number | null) => (v === null ? t("value.unknown") : dayMonth(v, locale));
   const rows: ReadonlyArray<{ label: MessageKey; a: string; b: string }> = [
-    { label: "stress.climate_rain", a: num(normal.precipMm, "mm"), b: num(scenario.precipMm, "mm") },
-    { label: "stress.climate_et0", a: num(normal.et0Mm, "mm"), b: num(scenario.et0Mm, "mm") },
+    { label: "stress.climate_rain", a: num(normal.precipMm, t("unit.mm")), b: num(scenario.precipMm, t("unit.mm")) },
+    { label: "stress.climate_et0", a: num(normal.et0Mm, t("unit.mm")), b: num(scenario.et0Mm, t("unit.mm")) },
     { label: "stress.climate_heat", a: num(normal.heatDays35, ""), b: num(scenario.heatDays35, "") },
     { label: "stress.climate_frost_free", a: num(normal.frostFreeDaysMean, ""), b: num(scenario.frostFreeDaysMean, "") },
     { label: "stress.climate_spring", a: day(normal.lastSpringSafe), b: day(scenario.lastSpringSafe) },
