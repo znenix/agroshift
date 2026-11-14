@@ -1,0 +1,84 @@
+{
+  "about": "DRAFT rotation templates (SPEC §5.8) — the 7 starter templates; the team verifies them with a local agronomist (verified: false). Year i is the crop year in which its main crop is harvested, so an autumn-sown main crop is sown in the previous calendar year; the cycle repeats. Display names are built from the crop names; the 'why suggested' texts are i18n keys.",
+  "rotations": [
+    {
+      "id": "cotton_mono",
+      "years": [{ "main": "cotton", "second": null }],
+      "why_key": "rotation.why.cotton_mono",
+      "tags": ["baseline", "monoculture"],
+      "conditions": { "mode": "irrigated", "suited_for": [] },
+      "sources": [{ "fields": ["years"], "source": "SPEC §5.8 starter template 1 — TODO: confirm with a local agronomist" }],
+      "verified": false
+    },
+    {
+      "id": "cotton_wheat",
+      "years": [
+        { "main": "cotton", "second": null },
+        { "main": "winter_wheat", "second": null }
+      ],
+      "why_key": "rotation.why.cotton_wheat",
+      "tags": ["cotton_wheat"],
+      "conditions": { "mode": "irrigated", "suited_for": [] },
+      "sources": [{ "fields": ["years"], "source": "SPEC §5.8 starter template 2 — TODO: confirm with a local agronomist" }],
+      "verified": false
+    },
+    {
+      "id": "cotton_wheat_mung",
+      "years": [
+        { "main": "cotton", "second": null },
+        { "main": "winter_wheat", "second": "mung_bean" }
+      ],
+      "why_key": "rotation.why.cotton_wheat_mung",
+      "tags": ["cotton_wheat", "double_crop", "legume"],
+      "conditions": { "mode": "irrigated", "suited_for": [] },
+      "sources": [{ "fields": ["years"], "source": "SPEC §5.8 starter template 3 — TODO: confirm with a local agronomist" }],
+      "verified": false
+    },
+    {
+      "id": "alfalfa_cotton_wheat",
+      "years": [
+        { "main": "alfalfa", "second": null },
+        { "main": "alfalfa", "second": null },
+        { "main": "alfalfa", "second": null },
+        { "main": "cotton", "second": null },
+        { "main": "cotton", "second": null },
+        { "main": "winter_wheat", "second": "mung_bean" }
+      ],
+      "why_key": "rotation.why.alfalfa_cotton_wheat",
+      "tags": ["perennial", "legume", "double_crop", "traditional"],
+      "conditions": { "mode": "irrigated", "suited_for": [] },
+      "sources": [{ "fields": ["years"], "source": "SPEC §5.8 starter template 4 (second crop after wheat: mung bean) — TODO: confirm with a local agronomist" }],
+      "verified": false
+    },
+    {
+      "id": "barley_sorghum",
+      "years": [{ "main": "winter_barley", "second": "sorghum" }],
+      "why_key": "rotation.why.barley_sorghum",
+      "tags": ["double_crop"],
+      "conditions": { "mode": "irrigated", "suited_for": ["saline", "water_short"] },
+      "sources": [{ "fields": ["years"], "source": "SPEC §5.8 starter template 5 — TODO: confirm with a local agronomist" }],
+      "verified": false
+    },
+    {
+      "id": "wheat_silage",
+      "years": [{ "main": "winter_wheat", "second": "maize_silage" }],
+      "why_key": "rotation.why.wheat_silage",
+      "tags": ["double_crop", "forage"],
+      "conditions": { "mode": "irrigated", "suited_for": ["livestock"] },
+      "sources": [{ "fields": ["years"], "source": "SPEC §5.8 starter template 6 — TODO: confirm with a local agronomist" }],
+      "verified": false
+    },
+    {
+      "id": "rainfed_wheat_chickpea",
+      "years": [
+        { "main": "winter_wheat", "second": null },
+        { "main": "chickpea", "second": null }
+      ],
+      "why_key": "rotation.why.rainfed_wheat_chickpea",
+      "tags": ["legume"],
+      "conditions": { "mode": "rainfed", "suited_for": [] },
+      "sources": [{ "fields": ["years"], "source": "SPEC §5.8 starter template 7 — TODO: confirm with a local agronomist" }],
+      "verified": false
+    }
+  ]
+}

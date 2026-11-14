@@ -1,0 +1,165 @@
+{
+  "about": "Share of irrigated land by salinity class, per region (SPEC §3.4). TEAM TASK: fill each region from a published land-reclamation report and cite it in `source` (title, publisher, year, table/page). Leave values null when unknown: the app then shows 'Salinity unknown — get a soil test' and marks salt-sensitive crops 'needs soil test'. Never enter a value without a source. A farmer's soil test (EC, dS/m) always overrides these values.",
+  "classes": [
+    "none",
+    "slight",
+    "moderate",
+    "strong"
+  ],
+  "regions": [
+    {
+      "region": "UZ-AN",
+      "year": null,
+      "shares_pct": {
+        "none": null,
+        "slight": null,
+        "moderate": null,
+        "strong": null
+      },
+      "source": null
+    },
+    {
+      "region": "UZ-BU",
+      "year": null,
+      "shares_pct": {
+        "none": null,
+        "slight": null,
+        "moderate": null,
+        "strong": null
+      },
+      "source": null
+    },
+    {
+      "region": "UZ-FA",
+      "year": null,
+      "shares_pct": {
+        "none": null,
+        "slight": null,
+        "moderate": null,
+        "strong": null
+      },
+      "source": null
+    },
+    {
+      "region": "UZ-JI",
+      "year": null,
+      "shares_pct": {
+        "none": null,
+        "slight": null,
+        "moderate": null,
+        "strong": null
+      },
+      "source": null
+    },
+    {
+      "region": "UZ-NG",
+      "year": null,
+      "shares_pct": {
+        "none": null,
+        "slight": null,
+        "moderate": null,
+        "strong": null
+      },
+      "source": null
+    },
+    {
+      "region": "UZ-NW",
+      "year": null,
+      "shares_pct": {
+        "none": null,
+        "slight": null,
+        "moderate": null,
+        "strong": null
+      },
+      "source": null
+    },
+    {
+      "region": "UZ-QA",
+      "year": null,
+      "shares_pct": {
+        "none": null,
+        "slight": null,
+        "moderate": null,
+        "strong": null
+      },
+      "source": null
+    },
+    {
+      "region": "UZ-QR",
+      "year": null,
+      "shares_pct": {
+        "none": null,
+        "slight": null,
+        "moderate": null,
+        "strong": null
+      },
+      "source": null
+    },
+    {
+      "region": "UZ-SA",
+      "year": null,
+      "shares_pct": {
+        "none": null,
+        "slight": null,
+        "moderate": null,
+        "strong": null
+      },
+      "source": null
+    },
+    {
+      "region": "UZ-SI",
+      "year": null,
+      "shares_pct": {
+        "none": null,
+        "slight": null,
+        "moderate": null,
+        "strong": null
+      },
+      "source": null
+    },
+    {
+      "region": "UZ-SU",
+      "year": null,
+      "shares_pct": {
+        "none": null,
+        "slight": null,
+        "moderate": null,
+        "strong": null
+      },
+      "source": null
+    },
+    {
+      "region": "UZ-TK",
+      "year": null,
+      "shares_pct": {
+        "none": null,
+        "slight": null,
+        "moderate": null,
+        "strong": null
+      },
+      "source": null
+    },
+    {
+      "region": "UZ-TO",
+      "year": null,
+      "shares_pct": {
+        "none": null,
+        "slight": null,
+        "moderate": null,
+        "strong": null
+      },
+      "source": null
+    },
+    {
+      "region": "UZ-XO",
+      "year": null,
+      "shares_pct": {
+        "none": null,
+        "slight": null,
+        "moderate": null,
+        "strong": null
+      },
+      "source": null
+    }
+  ]
+}

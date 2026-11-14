@@ -1,0 +1,1935 @@
+{
+  "about": "DRAFT crop parameters (SPEC §5.6) — every crop is verified: false until an agronomist checks it. `sources` says where each group of values comes from; 'TODO' marks values without a checked source, and the app shows 'values pending agronomist review'. Do not cite this file as a source. Orchards and vineyards are not in the rotation engine (they are not rotated).",
+  "crops": [
+    {
+      "id": "cotton",
+      "names": {
+        "uz": "Paxta (gʻoʻza)",
+        "ru": "Хлопчатник",
+        "en": "Cotton"
+      },
+      "family": "Malvaceae",
+      "perennial": false,
+      "years": null,
+      "sowing": {
+        "main": {
+          "type": "spring",
+          "tmean_above_c": 14
+        },
+        "second": null
+      },
+      "season_days": {
+        "main": 175,
+        "second": null
+      },
+      "kc_ini": 0.35,
+      "kc_mid": 1.175,
+      "kc_end": 0.6,
+      "stage_fractions": [
+        0.15,
+        0.26,
+        0.31,
+        0.28
+      ],
+      "temperature": {
+        "opt_min_c": 21,
+        "opt_max_c": 30,
+        "abs_min_c": 15,
+        "abs_max_c": 40
+      },
+      "heat_threshold_c": 38,
+      "heat_sensitive_window": {
+        "from_day": 65,
+        "to_day": 115
+      },
+      "frost_tolerance": "none",
+      "salinity": {
+        "ece_threshold": 7.7,
+        "slope_pct_per_dsm": 5.2
+      },
+      "ph": {
+        "opt_min": 5.8,
+        "opt_max": 8.0,
+        "abs_min": 5.0,
+        "abs_max": 8.5
+      },
+      "root_depth": "deep",
+      "n_fixing": false,
+      "residue": "med",
+      "forage_value": "none",
+      "drought_tolerance": "med",
+      "sources": [
+        {
+          "fields": [
+            "family",
+            "n_fixing"
+          ],
+          "source": "Botanical classification"
+        },
+        {
+          "fields": [
+            "sowing",
+            "season_days"
+          ],
+          "source": "TODO — approximate Uzbek practice; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "kc_ini",
+            "kc_mid",
+            "kc_end"
+          ],
+          "source": "FAO-56, Allen et al. (1998), Table 12 — row recalled from memory; verify against the table"
+        },
+        {
+          "fields": [
+            "stage_fractions"
+          ],
+          "source": "TODO — split approximated from FAO-56 Table 11 examples; check against Uzbek crop calendars"
+        },
+        {
+          "fields": [
+            "temperature"
+          ],
+          "source": "TODO — approximate ranges; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "heat_threshold_c",
+            "heat_sensitive_window",
+            "frost_tolerance"
+          ],
+          "source": "TODO — approximate; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "salinity"
+          ],
+          "source": "Maas & Hoffman (1977) salt-tolerance table, as reproduced in FAO-29 (Ayers & Westcot 1985) — row recalled from memory; verify"
+        },
+        {
+          "fields": [
+            "ph"
+          ],
+          "source": "TODO — approximate; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "root_depth",
+            "residue",
+            "forage_value",
+            "drought_tolerance"
+          ],
+          "source": "TODO — indicative classes; agronomist to confirm"
+        }
+      ],
+      "notes": [
+        "FAO-56 Table 12 gives Kc_mid 1.15–1.20 and Kc_end 0.70–0.50 (lower for a later harvest); midpoints used."
+      ],
+      "verified": false
+    },
+    {
+      "id": "winter_wheat",
+      "names": {
+        "uz": "Kuzgi bugʻdoy",
+        "ru": "Озимая пшеница",
+        "en": "Winter wheat"
+      },
+      "family": "Poaceae",
+      "perennial": false,
+      "years": null,
+      "sowing": {
+        "main": {
+          "type": "autumn",
+          "tmean_below_c": 16
+        },
+        "second": null
+      },
+      "season_days": {
+        "main": 250,
+        "second": null
+      },
+      "kc_ini": 0.7,
+      "kc_mid": 1.15,
+      "kc_end": 0.3,
+      "stage_fractions": [
+        0.12,
+        0.58,
+        0.17,
+        0.13
+      ],
+      "temperature": {
+        "opt_min_c": 15,
+        "opt_max_c": 23,
+        "abs_min_c": 3,
+        "abs_max_c": 32
+      },
+      "heat_threshold_c": 33,
+      "heat_sensitive_window": {
+        "from_day": 205,
+        "to_day": 235
+      },
+      "frost_tolerance": "hardy",
+      "salinity": {
+        "ece_threshold": 6.0,
+        "slope_pct_per_dsm": 7.1
+      },
+      "ph": {
+        "opt_min": 6.0,
+        "opt_max": 8.0,
+        "abs_min": 5.0,
+        "abs_max": 8.5
+      },
+      "root_depth": "medium",
+      "n_fixing": false,
+      "residue": "high",
+      "forage_value": "low",
+      "drought_tolerance": "med",
+      "sources": [
+        {
+          "fields": [
+            "family",
+            "n_fixing"
+          ],
+          "source": "Botanical classification"
+        },
+        {
+          "fields": [
+            "sowing",
+            "season_days"
+          ],
+          "source": "TODO — approximate Uzbek practice; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "kc_ini",
+            "kc_mid",
+            "kc_end"
+          ],
+          "source": "FAO-56, Allen et al. (1998), Table 12 — row recalled from memory; verify against the table"
+        },
+        {
+          "fields": [
+            "stage_fractions"
+          ],
+          "source": "TODO — split approximated from FAO-56 Table 11 examples; check against Uzbek crop calendars"
+        },
+        {
+          "fields": [
+            "temperature"
+          ],
+          "source": "TODO — approximate ranges; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "heat_threshold_c",
+            "heat_sensitive_window",
+            "frost_tolerance"
+          ],
+          "source": "TODO — approximate; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "salinity"
+          ],
+          "source": "Maas & Hoffman (1977) salt-tolerance table, as reproduced in FAO-29 (Ayers & Westcot 1985) — row recalled from memory; verify"
+        },
+        {
+          "fields": [
+            "ph"
+          ],
+          "source": "TODO — approximate; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "root_depth",
+            "residue",
+            "forage_value",
+            "drought_tolerance"
+          ],
+          "source": "TODO — indicative classes; agronomist to confirm"
+        }
+      ],
+      "notes": [
+        "FAO-56 Table 12: Kc_ini 0.7 for non-frozen soils, 0.4 where soils freeze; Kc_end 0.25–0.4.",
+        "The temperature ranges apply to the growing period, not the winter rest."
+      ],
+      "verified": false
+    },
+    {
+      "id": "winter_barley",
+      "names": {
+        "uz": "Kuzgi arpa",
+        "ru": "Озимый ячмень",
+        "en": "Winter barley"
+      },
+      "family": "Poaceae",
+      "perennial": false,
+      "years": null,
+      "sowing": {
+        "main": {
+          "type": "autumn",
+          "tmean_below_c": 15
+        },
+        "second": null
+      },
+      "season_days": {
+        "main": 235,
+        "second": null
+      },
+      "kc_ini": 0.3,
+      "kc_mid": 1.15,
+      "kc_end": 0.25,
+      "stage_fractions": [
+        0.13,
+        0.57,
+        0.17,
+        0.13
+      ],
+      "temperature": {
+        "opt_min_c": 12,
+        "opt_max_c": 22,
+        "abs_min_c": 2,
+        "abs_max_c": 32
+      },
+      "heat_threshold_c": 33,
+      "heat_sensitive_window": {
+        "from_day": 195,
+        "to_day": 220
+      },
+      "frost_tolerance": "hardy",
+      "salinity": {
+        "ece_threshold": 8.0,
+        "slope_pct_per_dsm": 5.0
+      },
+      "ph": {
+        "opt_min": 6.0,
+        "opt_max": 8.5,
+        "abs_min": 5.0,
+        "abs_max": 9.0
+      },
+      "root_depth": "medium",
+      "n_fixing": false,
+      "residue": "med",
+      "forage_value": "med",
+      "drought_tolerance": "high",
+      "sources": [
+        {
+          "fields": [
+            "family",
+            "n_fixing"
+          ],
+          "source": "Botanical classification"
+        },
+        {
+          "fields": [
+            "sowing",
+            "season_days"
+          ],
+          "source": "TODO — approximate Uzbek practice; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "kc_ini",
+            "kc_mid",
+            "kc_end"
+          ],
+          "source": "FAO-56, Allen et al. (1998), Table 12 — row recalled from memory; verify against the table"
+        },
+        {
+          "fields": [
+            "stage_fractions"
+          ],
+          "source": "TODO — split approximated from FAO-56 Table 11 examples; check against Uzbek crop calendars"
+        },
+        {
+          "fields": [
+            "temperature"
+          ],
+          "source": "TODO — approximate ranges; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "heat_threshold_c",
+            "heat_sensitive_window",
+            "frost_tolerance"
+          ],
+          "source": "TODO — approximate; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "salinity"
+          ],
+          "source": "Maas & Hoffman (1977) salt-tolerance table, as reproduced in FAO-29 (Ayers & Westcot 1985) — row recalled from memory; verify"
+        },
+        {
+          "fields": [
+            "ph"
+          ],
+          "source": "TODO — approximate; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "root_depth",
+            "residue",
+            "forage_value",
+            "drought_tolerance"
+          ],
+          "source": "TODO — indicative classes; agronomist to confirm"
+        }
+      ],
+      "notes": [
+        "The temperature ranges apply to the growing period, not the winter rest."
+      ],
+      "verified": false
+    },
+    {
+      "id": "maize_grain",
+      "names": {
+        "uz": "Makkajoʻxori (don uchun)",
+        "ru": "Кукуруза на зерно",
+        "en": "Maize (grain)"
+      },
+      "family": "Poaceae",
+      "perennial": false,
+      "years": null,
+      "sowing": {
+        "main": {
+          "type": "spring",
+          "tmean_above_c": 12
+        },
+        "second": {
+          "type": "after_previous",
+          "gap_days": 5
+        }
+      },
+      "season_days": {
+        "main": 140,
+        "second": 110
+      },
+      "kc_ini": 0.3,
+      "kc_mid": 1.2,
+      "kc_end": 0.35,
+      "stage_fractions": [
+        0.2,
+        0.27,
+        0.33,
+        0.2
+      ],
+      "temperature": {
+        "opt_min_c": 18,
+        "opt_max_c": 32,
+        "abs_min_c": 10,
+        "abs_max_c": 42
+      },
+      "heat_threshold_c": 35,
+      "heat_sensitive_window": {
+        "from_day": 55,
+        "to_day": 75
+      },
+      "frost_tolerance": "none",
+      "salinity": {
+        "ece_threshold": 1.7,
+        "slope_pct_per_dsm": 12.0
+      },
+      "ph": {
+        "opt_min": 5.5,
+        "opt_max": 7.5,
+        "abs_min": 5.0,
+        "abs_max": 8.5
+      },
+      "root_depth": "deep",
+      "n_fixing": false,
+      "residue": "high",
+      "forage_value": "med",
+      "drought_tolerance": "low",
+      "sources": [
+        {
+          "fields": [
+            "family",
+            "n_fixing"
+          ],
+          "source": "Botanical classification"
+        },
+        {
+          "fields": [
+            "sowing",
+            "season_days"
+          ],
+          "source": "TODO — approximate Uzbek practice; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "kc_ini",
+            "kc_mid",
+            "kc_end"
+          ],
+          "source": "FAO-56, Allen et al. (1998), Table 12 — row recalled from memory; verify against the table"
+        },
+        {
+          "fields": [
+            "stage_fractions"
+          ],
+          "source": "TODO — split approximated from FAO-56 Table 11 examples; check against Uzbek crop calendars"
+        },
+        {
+          "fields": [
+            "temperature"
+          ],
+          "source": "TODO — approximate ranges; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "heat_threshold_c",
+            "heat_sensitive_window",
+            "frost_tolerance"
+          ],
+          "source": "TODO — approximate; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "salinity"
+          ],
+          "source": "Maas & Hoffman (1977) salt-tolerance table, as reproduced in FAO-29 (Ayers & Westcot 1985) — row recalled from memory; verify"
+        },
+        {
+          "fields": [
+            "ph"
+          ],
+          "source": "TODO — approximate; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "root_depth",
+            "residue",
+            "forage_value",
+            "drought_tolerance"
+          ],
+          "source": "TODO — indicative classes; agronomist to confirm"
+        }
+      ],
+      "notes": [
+        "Kc_end 0.35 when the grain dries in the field; 0.60 if harvested moist (FAO-56 Table 12).",
+        "As a second crop after wheat it needs a short-season hybrid."
+      ],
+      "verified": false
+    },
+    {
+      "id": "maize_silage",
+      "names": {
+        "uz": "Makkajoʻxori (silos uchun)",
+        "ru": "Кукуруза на силос",
+        "en": "Maize (silage)"
+      },
+      "family": "Poaceae",
+      "perennial": false,
+      "years": null,
+      "sowing": {
+        "main": {
+          "type": "spring",
+          "tmean_above_c": 12
+        },
+        "second": {
+          "type": "after_previous",
+          "gap_days": 5
+        }
+      },
+      "season_days": {
+        "main": 110,
+        "second": 90
+      },
+      "kc_ini": 0.3,
+      "kc_mid": 1.2,
+      "kc_end": 0.6,
+      "stage_fractions": [
+        0.22,
+        0.33,
+        0.33,
+        0.12
+      ],
+      "temperature": {
+        "opt_min_c": 18,
+        "opt_max_c": 32,
+        "abs_min_c": 10,
+        "abs_max_c": 42
+      },
+      "heat_threshold_c": 35,
+      "heat_sensitive_window": {
+        "from_day": 50,
+        "to_day": 70
+      },
+      "frost_tolerance": "none",
+      "salinity": {
+        "ece_threshold": 1.8,
+        "slope_pct_per_dsm": 7.4
+      },
+      "ph": {
+        "opt_min": 5.5,
+        "opt_max": 7.5,
+        "abs_min": 5.0,
+        "abs_max": 8.5
+      },
+      "root_depth": "deep",
+      "n_fixing": false,
+      "residue": "low",
+      "forage_value": "high",
+      "drought_tolerance": "low",
+      "sources": [
+        {
+          "fields": [
+            "family",
+            "n_fixing"
+          ],
+          "source": "Botanical classification"
+        },
+        {
+          "fields": [
+            "sowing",
+            "season_days"
+          ],
+          "source": "TODO — approximate Uzbek practice; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "kc_ini",
+            "kc_mid",
+            "kc_end"
+          ],
+          "source": "FAO-56, Allen et al. (1998), Table 12 — row recalled from memory; verify against the table"
+        },
+        {
+          "fields": [
+            "stage_fractions"
+          ],
+          "source": "TODO — split approximated from FAO-56 Table 11 examples; check against Uzbek crop calendars"
+        },
+        {
+          "fields": [
+            "temperature"
+          ],
+          "source": "TODO — approximate ranges; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "heat_threshold_c",
+            "heat_sensitive_window",
+            "frost_tolerance"
+          ],
+          "source": "TODO — approximate; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "salinity"
+          ],
+          "source": "Maas & Hoffman (1977) salt-tolerance table, as reproduced in FAO-29 (Ayers & Westcot 1985) — row recalled from memory; verify"
+        },
+        {
+          "fields": [
+            "ph"
+          ],
+          "source": "TODO — approximate; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "root_depth",
+            "residue",
+            "forage_value",
+            "drought_tolerance"
+          ],
+          "source": "TODO — indicative classes; agronomist to confirm"
+        }
+      ],
+      "notes": [
+        "Kc from field maize harvested moist (FAO-56 Table 12), used as a proxy for silage cut at dough stage.",
+        "Salinity row: 'corn, forage'. Little residue stays because the whole plant is removed."
+      ],
+      "verified": false
+    },
+    {
+      "id": "rice",
+      "names": {
+        "uz": "Sholi",
+        "ru": "Рис",
+        "en": "Rice"
+      },
+      "family": "Poaceae",
+      "perennial": false,
+      "years": null,
+      "sowing": {
+        "main": {
+          "type": "spring",
+          "tmean_above_c": 15
+        },
+        "second": null
+      },
+      "season_days": {
+        "main": 140,
+        "second": null
+      },
+      "kc_ini": 1.05,
+      "kc_mid": 1.2,
+      "kc_end": 0.75,
+      "stage_fractions": [
+        0.21,
+        0.22,
+        0.43,
+        0.14
+      ],
+      "temperature": {
+        "opt_min_c": 20,
+        "opt_max_c": 32,
+        "abs_min_c": 12,
+        "abs_max_c": 38
+      },
+      "heat_threshold_c": 35,
+      "heat_sensitive_window": {
+        "from_day": 75,
+        "to_day": 95
+      },
+      "frost_tolerance": "none",
+      "salinity": {
+        "ece_threshold": 3.0,
+        "slope_pct_per_dsm": 12.0
+      },
+      "ph": {
+        "opt_min": 5.5,
+        "opt_max": 7.5,
+        "abs_min": 4.5,
+        "abs_max": 8.5
+      },
+      "root_depth": "shallow",
+      "n_fixing": false,
+      "residue": "med",
+      "forage_value": "low",
+      "drought_tolerance": "low",
+      "sources": [
+        {
+          "fields": [
+            "family",
+            "n_fixing"
+          ],
+          "source": "Botanical classification"
+        },
+        {
+          "fields": [
+            "sowing",
+            "season_days"
+          ],
+          "source": "TODO — approximate Uzbek practice; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "kc_ini",
+            "kc_mid",
+            "kc_end"
+          ],
+          "source": "FAO-56, Allen et al. (1998), Table 12 — row recalled from memory; verify against the table"
+        },
+        {
+          "fields": [
+            "stage_fractions"
+          ],
+          "source": "TODO — split approximated from FAO-56 Table 11 examples; check against Uzbek crop calendars"
+        },
+        {
+          "fields": [
+            "temperature"
+          ],
+          "source": "TODO — approximate ranges; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "heat_threshold_c",
+            "heat_sensitive_window",
+            "frost_tolerance"
+          ],
+          "source": "TODO — approximate; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "salinity"
+          ],
+          "source": "Maas & Hoffman (1977) salt-tolerance table, as reproduced in FAO-29 (Ayers & Westcot 1985) — row recalled from memory; verify"
+        },
+        {
+          "fields": [
+            "ph"
+          ],
+          "source": "TODO — approximate; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "root_depth",
+            "residue",
+            "forage_value",
+            "drought_tolerance"
+          ],
+          "source": "TODO — indicative classes; agronomist to confirm"
+        }
+      ],
+      "notes": [
+        "FAO-56 Table 12 gives Kc_end 0.90–0.60; midpoint used.",
+        "The water need covers crop evapotranspiration only: paddy flooding and percolation losses are NOT included, so real water use is much higher."
+      ],
+      "verified": false
+    },
+    {
+      "id": "sorghum",
+      "names": {
+        "uz": "Joʻxori",
+        "ru": "Сорго",
+        "en": "Sorghum"
+      },
+      "family": "Poaceae",
+      "perennial": false,
+      "years": null,
+      "sowing": {
+        "main": {
+          "type": "spring",
+          "tmean_above_c": 15
+        },
+        "second": {
+          "type": "after_previous",
+          "gap_days": 5
+        }
+      },
+      "season_days": {
+        "main": 120,
+        "second": 100
+      },
+      "kc_ini": 0.3,
+      "kc_mid": 1.05,
+      "kc_end": 0.55,
+      "stage_fractions": [
+        0.16,
+        0.28,
+        0.32,
+        0.24
+      ],
+      "temperature": {
+        "opt_min_c": 24,
+        "opt_max_c": 33,
+        "abs_min_c": 10,
+        "abs_max_c": 42
+      },
+      "heat_threshold_c": 38,
+      "heat_sensitive_window": {
+        "from_day": 55,
+        "to_day": 75
+      },
+      "frost_tolerance": "none",
+      "salinity": {
+        "ece_threshold": 6.8,
+        "slope_pct_per_dsm": 16.0
+      },
+      "ph": {
+        "opt_min": 5.5,
+        "opt_max": 8.0,
+        "abs_min": 5.0,
+        "abs_max": 8.5
+      },
+      "root_depth": "deep",
+      "n_fixing": false,
+      "residue": "med",
+      "forage_value": "med",
+      "drought_tolerance": "high",
+      "sources": [
+        {
+          "fields": [
+            "family",
+            "n_fixing"
+          ],
+          "source": "Botanical classification"
+        },
+        {
+          "fields": [
+            "sowing",
+            "season_days"
+          ],
+          "source": "TODO — approximate Uzbek practice; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "kc_ini",
+            "kc_mid",
+            "kc_end"
+          ],
+          "source": "FAO-56, Allen et al. (1998), Table 12 — row recalled from memory; verify against the table"
+        },
+        {
+          "fields": [
+            "stage_fractions"
+          ],
+          "source": "TODO — split approximated from FAO-56 Table 11 examples; check against Uzbek crop calendars"
+        },
+        {
+          "fields": [
+            "temperature"
+          ],
+          "source": "TODO — approximate ranges; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "heat_threshold_c",
+            "heat_sensitive_window",
+            "frost_tolerance"
+          ],
+          "source": "TODO — approximate; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "salinity"
+          ],
+          "source": "Maas & Hoffman (1977) salt-tolerance table, as reproduced in FAO-29 (Ayers & Westcot 1985) — row recalled from memory; verify"
+        },
+        {
+          "fields": [
+            "ph"
+          ],
+          "source": "TODO — approximate; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "root_depth",
+            "residue",
+            "forage_value",
+            "drought_tolerance"
+          ],
+          "source": "TODO — indicative classes; agronomist to confirm"
+        }
+      ],
+      "notes": [
+        "Grain sorghum row of FAO-56 Table 12 (Kc_mid 1.00–1.10; midpoint used)."
+      ],
+      "verified": false
+    },
+    {
+      "id": "alfalfa",
+      "names": {
+        "uz": "Beda",
+        "ru": "Люцерна",
+        "en": "Alfalfa"
+      },
+      "family": "Fabaceae",
+      "perennial": true,
+      "years": {
+        "min": 2,
+        "max": 4,
+        "default": 3
+      },
+      "sowing": {
+        "main": {
+          "type": "spring",
+          "tmean_above_c": 10
+        },
+        "second": null
+      },
+      "season_days": {
+        "main": 240,
+        "second": null
+      },
+      "kc_ini": 0.4,
+      "kc_mid": 0.95,
+      "kc_end": 0.9,
+      "stage_fractions": [
+        0.05,
+        0.1,
+        0.8,
+        0.05
+      ],
+      "temperature": {
+        "opt_min_c": 15,
+        "opt_max_c": 30,
+        "abs_min_c": 5,
+        "abs_max_c": 38
+      },
+      "heat_threshold_c": null,
+      "heat_sensitive_window": null,
+      "frost_tolerance": "hardy",
+      "salinity": {
+        "ece_threshold": 2.0,
+        "slope_pct_per_dsm": 7.3
+      },
+      "ph": {
+        "opt_min": 6.5,
+        "opt_max": 8.0,
+        "abs_min": 6.0,
+        "abs_max": 8.5
+      },
+      "root_depth": "deep",
+      "n_fixing": true,
+      "residue": "high",
+      "forage_value": "high",
+      "drought_tolerance": "med",
+      "sources": [
+        {
+          "fields": [
+            "family",
+            "n_fixing"
+          ],
+          "source": "Botanical classification"
+        },
+        {
+          "fields": [
+            "sowing",
+            "season_days",
+            "years"
+          ],
+          "source": "TODO — approximate Uzbek practice; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "kc_ini",
+            "kc_mid",
+            "kc_end"
+          ],
+          "source": "FAO-56, Allen et al. (1998), Table 12 — row recalled from memory; verify against the table"
+        },
+        {
+          "fields": [
+            "stage_fractions"
+          ],
+          "source": "TODO — split approximated from FAO-56 Table 11 examples; check against Uzbek crop calendars"
+        },
+        {
+          "fields": [
+            "temperature"
+          ],
+          "source": "TODO — approximate ranges; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "heat_threshold_c",
+            "heat_sensitive_window",
+            "frost_tolerance"
+          ],
+          "source": "TODO — approximate; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "salinity"
+          ],
+          "source": "Maas & Hoffman (1977) salt-tolerance table, as reproduced in FAO-29 (Ayers & Westcot 1985) — row recalled from memory; verify"
+        },
+        {
+          "fields": [
+            "ph"
+          ],
+          "source": "TODO — approximate; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "root_depth",
+            "residue",
+            "forage_value",
+            "drought_tolerance"
+          ],
+          "source": "TODO — indicative classes; agronomist to confirm"
+        }
+      ],
+      "notes": [
+        "Kc for hay with averaged cutting effects (FAO-56 Table 12).",
+        "season_days is the active growth per year (about March–October); the field stays covered through winter.",
+        "No single heat-sensitive stage is modelled for a forage crop."
+      ],
+      "verified": false
+    },
+    {
+      "id": "mung_bean",
+      "names": {
+        "uz": "Mosh",
+        "ru": "Маш",
+        "en": "Mung bean"
+      },
+      "family": "Fabaceae",
+      "perennial": false,
+      "years": null,
+      "sowing": {
+        "main": {
+          "type": "spring",
+          "tmean_above_c": 18
+        },
+        "second": {
+          "type": "after_previous",
+          "gap_days": 5
+        }
+      },
+      "season_days": {
+        "main": 90,
+        "second": 90
+      },
+      "kc_ini": 0.4,
+      "kc_mid": 1.05,
+      "kc_end": 0.35,
+      "stage_fractions": [
+        0.2,
+        0.3,
+        0.35,
+        0.15
+      ],
+      "temperature": {
+        "opt_min_c": 20,
+        "opt_max_c": 32,
+        "abs_min_c": 10,
+        "abs_max_c": 40
+      },
+      "heat_threshold_c": 37,
+      "heat_sensitive_window": {
+        "from_day": 30,
+        "to_day": 55
+      },
+      "frost_tolerance": "none",
+      "salinity": {
+        "ece_threshold": 1.8,
+        "slope_pct_per_dsm": 20.7
+      },
+      "ph": {
+        "opt_min": 6.0,
+        "opt_max": 7.5,
+        "abs_min": 5.0,
+        "abs_max": 8.5
+      },
+      "root_depth": "medium",
+      "n_fixing": true,
+      "residue": "low",
+      "forage_value": "low",
+      "drought_tolerance": "med",
+      "sources": [
+        {
+          "fields": [
+            "family",
+            "n_fixing"
+          ],
+          "source": "Botanical classification"
+        },
+        {
+          "fields": [
+            "sowing",
+            "season_days"
+          ],
+          "source": "TODO — approximate Uzbek practice; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "kc_ini",
+            "kc_mid",
+            "kc_end"
+          ],
+          "source": "FAO-56, Allen et al. (1998), Table 12 — row recalled from memory; verify against the table"
+        },
+        {
+          "fields": [
+            "stage_fractions"
+          ],
+          "source": "TODO — split approximated from FAO-56 Table 11 examples; check against Uzbek crop calendars"
+        },
+        {
+          "fields": [
+            "temperature"
+          ],
+          "source": "TODO — approximate ranges; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "heat_threshold_c",
+            "heat_sensitive_window",
+            "frost_tolerance"
+          ],
+          "source": "TODO — approximate; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "salinity"
+          ],
+          "source": "TODO — Maas & Hoffman (1977) / FAO-29 value recalled with low confidence; verify"
+        },
+        {
+          "fields": [
+            "ph"
+          ],
+          "source": "TODO — approximate; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "root_depth",
+            "residue",
+            "forage_value",
+            "drought_tolerance"
+          ],
+          "source": "TODO — indicative classes; agronomist to confirm"
+        }
+      ],
+      "notes": [
+        "FAO-56 'green gram and cowpeas' row; Kc_end 0.35 for a dry-seed harvest (table range 0.60–0.35).",
+        "The usual takroriy ekin (second crop) after winter wheat."
+      ],
+      "verified": false
+    },
+    {
+      "id": "chickpea",
+      "names": {
+        "uz": "Noʻxat",
+        "ru": "Нут",
+        "en": "Chickpea"
+      },
+      "family": "Fabaceae",
+      "perennial": false,
+      "years": null,
+      "sowing": {
+        "main": {
+          "type": "spring",
+          "tmean_above_c": 5
+        },
+        "second": null
+      },
+      "season_days": {
+        "main": 110,
+        "second": null
+      },
+      "kc_ini": 0.4,
+      "kc_mid": 1.0,
+      "kc_end": 0.35,
+      "stage_fractions": [
+        0.2,
+        0.3,
+        0.3,
+        0.2
+      ],
+      "temperature": {
+        "opt_min_c": 15,
+        "opt_max_c": 28,
+        "abs_min_c": 5,
+        "abs_max_c": 35
+      },
+      "heat_threshold_c": 32,
+      "heat_sensitive_window": {
+        "from_day": 55,
+        "to_day": 85
+      },
+      "frost_tolerance": "light",
+      "salinity": {
+        "ece_threshold": null,
+        "slope_pct_per_dsm": null
+      },
+      "ph": {
+        "opt_min": 6.0,
+        "opt_max": 8.0,
+        "abs_min": 5.5,
+        "abs_max": 9.0
+      },
+      "root_depth": "medium",
+      "n_fixing": true,
+      "residue": "low",
+      "forage_value": "low",
+      "drought_tolerance": "high",
+      "sources": [
+        {
+          "fields": [
+            "family",
+            "n_fixing"
+          ],
+          "source": "Botanical classification"
+        },
+        {
+          "fields": [
+            "sowing",
+            "season_days"
+          ],
+          "source": "TODO — approximate Uzbek practice; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "kc_ini",
+            "kc_mid",
+            "kc_end"
+          ],
+          "source": "FAO-56, Allen et al. (1998), Table 12 — row recalled from memory; verify against the table"
+        },
+        {
+          "fields": [
+            "stage_fractions"
+          ],
+          "source": "TODO — split approximated from FAO-56 Table 11 examples; check against Uzbek crop calendars"
+        },
+        {
+          "fields": [
+            "temperature"
+          ],
+          "source": "TODO — approximate ranges; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "heat_threshold_c",
+            "heat_sensitive_window",
+            "frost_tolerance"
+          ],
+          "source": "TODO — approximate; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "salinity"
+          ],
+          "source": "TODO — no checked value; the app shows an information gap"
+        },
+        {
+          "fields": [
+            "ph"
+          ],
+          "source": "TODO — approximate; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "root_depth",
+            "residue",
+            "forage_value",
+            "drought_tolerance"
+          ],
+          "source": "TODO — indicative classes; agronomist to confirm"
+        }
+      ],
+      "notes": [
+        "Mainly a rain-fed (lalmi) crop in Uzbekistan, sown in early spring."
+      ],
+      "verified": false
+    },
+    {
+      "id": "soybean",
+      "names": {
+        "uz": "Soya",
+        "ru": "Соя",
+        "en": "Soybean"
+      },
+      "family": "Fabaceae",
+      "perennial": false,
+      "years": null,
+      "sowing": {
+        "main": {
+          "type": "spring",
+          "tmean_above_c": 14
+        },
+        "second": {
+          "type": "after_previous",
+          "gap_days": 5
+        }
+      },
+      "season_days": {
+        "main": 130,
+        "second": 110
+      },
+      "kc_ini": 0.4,
+      "kc_mid": 1.15,
+      "kc_end": 0.5,
+      "stage_fractions": [
+        0.15,
+        0.2,
+        0.45,
+        0.2
+      ],
+      "temperature": {
+        "opt_min_c": 20,
+        "opt_max_c": 32,
+        "abs_min_c": 10,
+        "abs_max_c": 38
+      },
+      "heat_threshold_c": 35,
+      "heat_sensitive_window": {
+        "from_day": 45,
+        "to_day": 80
+      },
+      "frost_tolerance": "none",
+      "salinity": {
+        "ece_threshold": 5.0,
+        "slope_pct_per_dsm": 20.0
+      },
+      "ph": {
+        "opt_min": 6.0,
+        "opt_max": 7.5,
+        "abs_min": 5.0,
+        "abs_max": 8.5
+      },
+      "root_depth": "medium",
+      "n_fixing": true,
+      "residue": "med",
+      "forage_value": "low",
+      "drought_tolerance": "low",
+      "sources": [
+        {
+          "fields": [
+            "family",
+            "n_fixing"
+          ],
+          "source": "Botanical classification"
+        },
+        {
+          "fields": [
+            "sowing",
+            "season_days"
+          ],
+          "source": "TODO — approximate Uzbek practice; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "kc_ini",
+            "kc_mid",
+            "kc_end"
+          ],
+          "source": "FAO-56, Allen et al. (1998), Table 12 — row recalled from memory; verify against the table"
+        },
+        {
+          "fields": [
+            "stage_fractions"
+          ],
+          "source": "TODO — split approximated from FAO-56 Table 11 examples; check against Uzbek crop calendars"
+        },
+        {
+          "fields": [
+            "temperature"
+          ],
+          "source": "TODO — approximate ranges; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "heat_threshold_c",
+            "heat_sensitive_window",
+            "frost_tolerance"
+          ],
+          "source": "TODO — approximate; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "salinity"
+          ],
+          "source": "Maas & Hoffman (1977) salt-tolerance table, as reproduced in FAO-29 (Ayers & Westcot 1985) — row recalled from memory; verify"
+        },
+        {
+          "fields": [
+            "ph"
+          ],
+          "source": "TODO — approximate; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "root_depth",
+            "residue",
+            "forage_value",
+            "drought_tolerance"
+          ],
+          "source": "TODO — indicative classes; agronomist to confirm"
+        }
+      ],
+      "notes": [],
+      "verified": false
+    },
+    {
+      "id": "sunflower",
+      "names": {
+        "uz": "Kungaboqar",
+        "ru": "Подсолнечник",
+        "en": "Sunflower"
+      },
+      "family": "Asteraceae",
+      "perennial": false,
+      "years": null,
+      "sowing": {
+        "main": {
+          "type": "spring",
+          "tmean_above_c": 10
+        },
+        "second": {
+          "type": "after_previous",
+          "gap_days": 5
+        }
+      },
+      "season_days": {
+        "main": 120,
+        "second": 100
+      },
+      "kc_ini": 0.35,
+      "kc_mid": 1.05,
+      "kc_end": 0.35,
+      "stage_fractions": [
+        0.19,
+        0.27,
+        0.35,
+        0.19
+      ],
+      "temperature": {
+        "opt_min_c": 18,
+        "opt_max_c": 30,
+        "abs_min_c": 6,
+        "abs_max_c": 40
+      },
+      "heat_threshold_c": 35,
+      "heat_sensitive_window": {
+        "from_day": 55,
+        "to_day": 80
+      },
+      "frost_tolerance": "light",
+      "salinity": {
+        "ece_threshold": null,
+        "slope_pct_per_dsm": null
+      },
+      "ph": {
+        "opt_min": 6.0,
+        "opt_max": 7.5,
+        "abs_min": 5.0,
+        "abs_max": 8.5
+      },
+      "root_depth": "deep",
+      "n_fixing": false,
+      "residue": "med",
+      "forage_value": "low",
+      "drought_tolerance": "med",
+      "sources": [
+        {
+          "fields": [
+            "family",
+            "n_fixing"
+          ],
+          "source": "Botanical classification"
+        },
+        {
+          "fields": [
+            "sowing",
+            "season_days"
+          ],
+          "source": "TODO — approximate Uzbek practice; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "kc_ini",
+            "kc_mid",
+            "kc_end"
+          ],
+          "source": "FAO-56, Allen et al. (1998), Table 12 — row recalled from memory; verify against the table"
+        },
+        {
+          "fields": [
+            "stage_fractions"
+          ],
+          "source": "TODO — split approximated from FAO-56 Table 11 examples; check against Uzbek crop calendars"
+        },
+        {
+          "fields": [
+            "temperature"
+          ],
+          "source": "TODO — approximate ranges; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "heat_threshold_c",
+            "heat_sensitive_window",
+            "frost_tolerance"
+          ],
+          "source": "TODO — approximate; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "salinity"
+          ],
+          "source": "TODO — no checked value; the app shows an information gap"
+        },
+        {
+          "fields": [
+            "ph"
+          ],
+          "source": "TODO — approximate; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "root_depth",
+            "residue",
+            "forage_value",
+            "drought_tolerance"
+          ],
+          "source": "TODO — indicative classes; agronomist to confirm"
+        }
+      ],
+      "notes": [
+        "FAO-56 Table 12 gives Kc_mid 1.0–1.15; midpoint used."
+      ],
+      "verified": false
+    },
+    {
+      "id": "potato",
+      "names": {
+        "uz": "Kartoshka",
+        "ru": "Картофель",
+        "en": "Potato"
+      },
+      "family": "Solanaceae",
+      "perennial": false,
+      "years": null,
+      "sowing": {
+        "main": {
+          "type": "spring",
+          "tmean_above_c": 8
+        },
+        "second": {
+          "type": "after_previous",
+          "gap_days": 7
+        }
+      },
+      "season_days": {
+        "main": 110,
+        "second": 100
+      },
+      "kc_ini": 0.5,
+      "kc_mid": 1.15,
+      "kc_end": 0.75,
+      "stage_fractions": [
+        0.24,
+        0.29,
+        0.29,
+        0.18
+      ],
+      "temperature": {
+        "opt_min_c": 15,
+        "opt_max_c": 22,
+        "abs_min_c": 5,
+        "abs_max_c": 30
+      },
+      "heat_threshold_c": 30,
+      "heat_sensitive_window": {
+        "from_day": 40,
+        "to_day": 90
+      },
+      "frost_tolerance": "light",
+      "salinity": {
+        "ece_threshold": 1.7,
+        "slope_pct_per_dsm": 12.0
+      },
+      "ph": {
+        "opt_min": 5.0,
+        "opt_max": 6.5,
+        "abs_min": 4.5,
+        "abs_max": 8.0
+      },
+      "root_depth": "shallow",
+      "n_fixing": false,
+      "residue": "low",
+      "forage_value": "none",
+      "drought_tolerance": "low",
+      "sources": [
+        {
+          "fields": [
+            "family",
+            "n_fixing"
+          ],
+          "source": "Botanical classification"
+        },
+        {
+          "fields": [
+            "sowing",
+            "season_days"
+          ],
+          "source": "TODO — approximate Uzbek practice; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "kc_ini",
+            "kc_mid",
+            "kc_end"
+          ],
+          "source": "FAO-56, Allen et al. (1998), Table 12 — row recalled from memory; verify against the table"
+        },
+        {
+          "fields": [
+            "stage_fractions"
+          ],
+          "source": "TODO — split approximated from FAO-56 Table 11 examples; check against Uzbek crop calendars"
+        },
+        {
+          "fields": [
+            "temperature"
+          ],
+          "source": "TODO — approximate ranges; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "heat_threshold_c",
+            "heat_sensitive_window",
+            "frost_tolerance"
+          ],
+          "source": "TODO — approximate; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "salinity"
+          ],
+          "source": "Maas & Hoffman (1977) salt-tolerance table, as reproduced in FAO-29 (Ayers & Westcot 1985) — row recalled from memory; verify"
+        },
+        {
+          "fields": [
+            "ph"
+          ],
+          "source": "TODO — approximate; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "root_depth",
+            "residue",
+            "forage_value",
+            "drought_tolerance"
+          ],
+          "source": "TODO — indicative classes; agronomist to confirm"
+        }
+      ],
+      "notes": [
+        "A second (summer) planting is practised in some regions."
+      ],
+      "verified": false
+    },
+    {
+      "id": "melon",
+      "names": {
+        "uz": "Qovun",
+        "ru": "Дыня",
+        "en": "Melon"
+      },
+      "family": "Cucurbitaceae",
+      "perennial": false,
+      "years": null,
+      "sowing": {
+        "main": {
+          "type": "spring",
+          "tmean_above_c": 16
+        },
+        "second": null
+      },
+      "season_days": {
+        "main": 110,
+        "second": null
+      },
+      "kc_ini": 0.5,
+      "kc_mid": 1.05,
+      "kc_end": 0.75,
+      "stage_fractions": [
+        0.21,
+        0.29,
+        0.33,
+        0.17
+      ],
+      "temperature": {
+        "opt_min_c": 20,
+        "opt_max_c": 33,
+        "abs_min_c": 12,
+        "abs_max_c": 40
+      },
+      "heat_threshold_c": 38,
+      "heat_sensitive_window": {
+        "from_day": 35,
+        "to_day": 65
+      },
+      "frost_tolerance": "none",
+      "salinity": {
+        "ece_threshold": 1.0,
+        "slope_pct_per_dsm": 8.4
+      },
+      "ph": {
+        "opt_min": 6.0,
+        "opt_max": 7.5,
+        "abs_min": 5.5,
+        "abs_max": 8.5
+      },
+      "root_depth": "medium",
+      "n_fixing": false,
+      "residue": "low",
+      "forage_value": "none",
+      "drought_tolerance": "med",
+      "sources": [
+        {
+          "fields": [
+            "family",
+            "n_fixing"
+          ],
+          "source": "Botanical classification"
+        },
+        {
+          "fields": [
+            "sowing",
+            "season_days"
+          ],
+          "source": "TODO — approximate Uzbek practice; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "kc_ini",
+            "kc_mid",
+            "kc_end"
+          ],
+          "source": "FAO-56, Allen et al. (1998), Table 12 — row recalled from memory; verify against the table"
+        },
+        {
+          "fields": [
+            "stage_fractions"
+          ],
+          "source": "TODO — split approximated from FAO-56 Table 11 examples; check against Uzbek crop calendars"
+        },
+        {
+          "fields": [
+            "temperature"
+          ],
+          "source": "TODO — approximate ranges; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "heat_threshold_c",
+            "heat_sensitive_window",
+            "frost_tolerance"
+          ],
+          "source": "TODO — approximate; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "salinity"
+          ],
+          "source": "TODO — Maas & Hoffman (1977) / FAO-29 value recalled with low confidence; verify"
+        },
+        {
+          "fields": [
+            "ph"
+          ],
+          "source": "TODO — approximate; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "root_depth",
+            "residue",
+            "forage_value",
+            "drought_tolerance"
+          ],
+          "source": "TODO — indicative classes; agronomist to confirm"
+        }
+      ],
+      "notes": [
+        "FAO-56 'sweet melons' row; salinity row 'muskmelon'."
+      ],
+      "verified": false
+    },
+    {
+      "id": "triticale",
+      "names": {
+        "uz": "Tritikale",
+        "ru": "Тритикале",
+        "en": "Triticale (winter cover)"
+      },
+      "family": "Poaceae",
+      "perennial": false,
+      "years": null,
+      "sowing": {
+        "main": {
+          "type": "autumn",
+          "tmean_below_c": 15
+        },
+        "second": null
+      },
+      "season_days": {
+        "main": 200,
+        "second": null
+      },
+      "kc_ini": 0.7,
+      "kc_mid": 1.15,
+      "kc_end": 1.0,
+      "stage_fractions": [
+        0.15,
+        0.6,
+        0.2,
+        0.05
+      ],
+      "temperature": {
+        "opt_min_c": 12,
+        "opt_max_c": 25,
+        "abs_min_c": 2,
+        "abs_max_c": 32
+      },
+      "heat_threshold_c": null,
+      "heat_sensitive_window": null,
+      "frost_tolerance": "hardy",
+      "salinity": {
+        "ece_threshold": 6.1,
+        "slope_pct_per_dsm": 2.5
+      },
+      "ph": {
+        "opt_min": 5.5,
+        "opt_max": 8.0,
+        "abs_min": 4.5,
+        "abs_max": 8.5
+      },
+      "root_depth": "medium",
+      "n_fixing": false,
+      "residue": "high",
+      "forage_value": "high",
+      "drought_tolerance": "med",
+      "sources": [
+        {
+          "fields": [
+            "family",
+            "n_fixing"
+          ],
+          "source": "Botanical classification"
+        },
+        {
+          "fields": [
+            "sowing",
+            "season_days"
+          ],
+          "source": "TODO — approximate Uzbek practice; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "kc_ini",
+            "kc_mid",
+            "kc_end"
+          ],
+          "source": "TODO — no FAO-56 Table 12 row; winter wheat values used as a proxy (ASSUMPTION)"
+        },
+        {
+          "fields": [
+            "stage_fractions"
+          ],
+          "source": "TODO — split approximated from FAO-56 Table 11 examples; check against Uzbek crop calendars"
+        },
+        {
+          "fields": [
+            "temperature"
+          ],
+          "source": "TODO — approximate ranges; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "heat_threshold_c",
+            "heat_sensitive_window",
+            "frost_tolerance"
+          ],
+          "source": "TODO — approximate; agronomist to confirm"
+        },
+        {
+          "fields": [
+            "salinity"
+          ],
+          "source": "TODO — Maas & Hoffman (1977) / FAO-29 value recalled with low confidence; verify"
+        },
+        {
+          "fields": [
+            "ph"
+          ],
+          "source": "TODO — approximate; check against FAO EcoCrop"
+        },
+        {
+          "fields": [
+            "root_depth",
+            "residue",
+            "forage_value",
+            "drought_tolerance"
+          ],
+          "source": "TODO — indicative classes; agronomist to confirm"
+        }
+      ],
+      "notes": [
+        "Winter cover / forage crop cut green in spring, so no grain-filling heat window and Kc_end stays high (ASSUMPTION)."
+      ],
+      "verified": false
+    }
+  ]
+}

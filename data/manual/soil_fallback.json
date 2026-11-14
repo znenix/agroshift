@@ -1,0 +1,131 @@
+{
+  "about": "Last-resort 0-30 cm topsoil values per region, used only when SoilGrids is unavailable (SPEC §3.3, level 3) and always labelled 'estimated'. TEAM TASK: fill from a published source and cite it in `source`, or leave null (the app then shows an information gap).",
+  "regions": [
+    {
+      "region": "UZ-AN",
+      "ph_h2o": null,
+      "soc_g_kg": null,
+      "clay_pct": null,
+      "sand_pct": null,
+      "silt_pct": null,
+      "source": null
+    },
+    {
+      "region": "UZ-BU",
+      "ph_h2o": null,
+      "soc_g_kg": null,
+      "clay_pct": null,
+      "sand_pct": null,
+      "silt_pct": null,
+      "source": null
+    },
+    {
+      "region": "UZ-FA",
+      "ph_h2o": null,
+      "soc_g_kg": null,
+      "clay_pct": null,
+      "sand_pct": null,
+      "silt_pct": null,
+      "source": null
+    },
+    {
+      "region": "UZ-JI",
+      "ph_h2o": null,
+      "soc_g_kg": null,
+      "clay_pct": null,
+      "sand_pct": null,
+      "silt_pct": null,
+      "source": null
+    },
+    {
+      "region": "UZ-NG",
+      "ph_h2o": null,
+      "soc_g_kg": null,
+      "clay_pct": null,
+      "sand_pct": null,
+      "silt_pct": null,
+      "source": null
+    },
+    {
+      "region": "UZ-NW",
+      "ph_h2o": null,
+      "soc_g_kg": null,
+      "clay_pct": null,
+      "sand_pct": null,
+      "silt_pct": null,
+      "source": null
+    },
+    {
+      "region": "UZ-QA",
+      "ph_h2o": null,
+      "soc_g_kg": null,
+      "clay_pct": null,
+      "sand_pct": null,
+      "silt_pct": null,
+      "source": null
+    },
+    {
+      "region": "UZ-QR",
+      "ph_h2o": null,
+      "soc_g_kg": null,
+      "clay_pct": null,
+      "sand_pct": null,
+      "silt_pct": null,
+      "source": null
+    },
+    {
+      "region": "UZ-SA",
+      "ph_h2o": null,
+      "soc_g_kg": null,
+      "clay_pct": null,
+      "sand_pct": null,
+      "silt_pct": null,
+      "source": null
+    },
+    {
+      "region": "UZ-SI",
+      "ph_h2o": null,
+      "soc_g_kg": null,
+      "clay_pct": null,
+      "sand_pct": null,
+      "silt_pct": null,
+      "source": null
+    },
+    {
+      "region": "UZ-SU",
+      "ph_h2o": null,
+      "soc_g_kg": null,
+      "clay_pct": null,
+      "sand_pct": null,
+      "silt_pct": null,
+      "source": null
+    },
+    {
+      "region": "UZ-TK",
+      "ph_h2o": null,
+      "soc_g_kg": null,
+      "clay_pct": null,
+      "sand_pct": null,
+      "silt_pct": null,
+      "source": null
+    },
+    {
+      "region": "UZ-TO",
+      "ph_h2o": null,
+      "soc_g_kg": null,
+      "clay_pct": null,
+      "sand_pct": null,
+      "silt_pct": null,
+      "source": null
+    },
+    {
+      "region": "UZ-XO",
+      "ph_h2o": null,
+      "soc_g_kg": null,
+      "clay_pct": null,
+      "sand_pct": null,
+      "silt_pct": null,
+      "source": null
+    }
+  ]
+}
