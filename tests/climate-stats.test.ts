@@ -4,6 +4,7 @@ import {
   annualMeansOfMonthly,
   climateTrends,
   monthlyAnomalies,
+  monthlyExtremeDays,
   monthlyNormals,
   type AnnualClimate,
 } from "@/lib/climate";
@@ -72,5 +73,17 @@ describe("soil-moisture anomaly and trends (SPEC §5.1, §5.4)", () => {
     const rising: AnnualClimate[] = flat.map((a, i) => ({ ...a, precipMm: 150 + 5 * i }));
     expect(climateTrends(rising).precipMm?.direction).toBe("rising");
     expect(climateTrends(flat).heatDays35?.direction).toBe("no_clear_trend");
+  });
+});
+
+describe("heat and frost month strip (SPEC §6)", () => {
+  it("counts mean heat and frost days per calendar month and skips months with missing days", () => {
+    const strip = monthlyExtremeDays(climate, [2010, 2011]);
+    expect(strip).toHaveLength(12);
+    expect(strip[6]).toEqual({ month: 7, heatDays: 31, frostDays: 0 });
+    expect(strip[0]?.frostDays).toBe(31);
+    expect(strip[3]?.heatDays).toBe(0);
+    const gappy = { ...climate, tmax: climate.tmax.map((v, i) => (climate.dates[i]?.startsWith("2010-07") ? null : v)) };
+    expect(monthlyExtremeDays(gappy, [2010])[6]).toEqual({ month: 7, heatDays: null, frostDays: null });
   });
 });

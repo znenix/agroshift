@@ -15,6 +15,24 @@
   --color-ink: #1c1f1a;
   --color-ink-muted: #4a5446;
 
+  /*
+   * Chart colours: the dataviz reference categorical palette, validated (scripts/validate_palette.js)
+   * against this page surface #fbf8f1: all checks pass; slots 3–5 are below 3:1, so charts using them
+   * always carry visible labels or a table view. Slots are fixed per entity (e.g. crop family).
+   */
+  --color-series-1: #2a78d6;
+  --color-series-2: #eb6834;
+  --color-series-3: #1baf7a;
+  --color-series-4: #eda100;
+  --color-series-5: #e87ba4;
+  --color-series-6: #008300;
+  --color-grid: #e6e1d4;
+  /* Status colours are reserved for status and always paired with an icon and a label. */
+  --color-status-good: #0ca30c;
+  --color-status-warning: #fab219;
+  --color-status-serious: #ec835a;
+  --color-status-critical: #d03b3b;
+
   /* System fonts: no build-time font download, no font request from the browser. */
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;

@@ -320,6 +320,40 @@ export function monthlyNormals(
   });
 }
 
+export interface MonthlyExtremeDays {
+  month: number;
+  /** Mean number of days per month with Tmax ≥ the first heat threshold (35 °C). */
+  heatDays: number | null;
+  /** Mean number of days per month with Tmin ≤ 0 °C. */
+  frostDays: number | null;
+}
+
+/** Heat/frost month strip (SPEC §6): mean days per calendar month, over months with no missing day. */
+export function monthlyExtremeDays(climate: DailyClimate, years: readonly number[]): MonthlyExtremeDays[] {
+  const yearSet = new Set(years);
+  const heatAt = HEAT_DAY_THRESHOLDS_C[0];
+  const months = new Map<string, { heat: number; frost: number; ok: boolean }>();
+  climate.dates.forEach((date, i) => {
+    if (!yearSet.has(Number(date.slice(0, 4)))) return;
+    const key = date.slice(0, 7);
+    const month = months.get(key) ?? { heat: 0, frost: 0, ok: true };
+    const tmax = climate.tmax[i];
+    const tmin = climate.tmin[i];
+    if (typeof tmax !== "number" || typeof tmin !== "number") month.ok = false;
+    else {
+      if (tmax >= heatAt) month.heat++;
+      if (tmin <= FROST_TMIN_C) month.frost++;
+    }
+    months.set(key, month);
+  });
+  return Array.from({ length: 12 }, (_, m) => {
+    const complete = [...months.entries()].filter(([key, v]) => Number(key.slice(5, 7)) === m + 1 && v.ok).map(([, v]) => v);
+    const avg = (pick: (v: { heat: number; frost: number }) => number) =>
+      complete.length === 0 ? null : Math.round((complete.reduce((a, v) => a + pick(v), 0) / complete.length) * 10) / 10;
+    return { month: m + 1, heatDays: avg((v) => v.heat), frostDays: avg((v) => v.frost) };
+  });
+}
+
 /**
  * Standardised anomaly (z-score) of each month of a monthly series against the same calendar month in
  * `firstYear`–`lastYear` (SPEC §5.1 soil-moisture anomaly). `null` where the value or the climatology is missing.

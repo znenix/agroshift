@@ -164,8 +164,14 @@ export function createTranslator({
   };
 }
 
+const warned = new Set<string>();
+
+/** Each missing key or parameter is reported once per process, so the console stays readable. */
 function warnInDevelopment(issue: MissingTranslation): void {
   if (process.env.NODE_ENV !== "development") return;
+  const id = `${issue.kind}:${issue.locale}:${issue.key}:${issue.kind === "param" ? issue.param : ""}`;
+  if (warned.has(id)) return;
+  warned.add(id);
   console.warn(
     issue.kind === "key"
       ? `[i18n] "${issue.key}" is missing in ${issue.locale}.json; showing English.`

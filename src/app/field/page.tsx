@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { getServerI18n } from "@/app/i18n-server";
-import { PagePlaceholder } from "@/components/PagePlaceholder";
+import { FieldFlow } from "@/components/field/FieldFlow";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { t } = await getServerI18n();
@@ -9,5 +10,12 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function FieldPage() {
   const { t } = await getServerI18n();
-  return <PagePlaceholder title={t("field.title")} note={t("common.under_construction")} />;
+  return (
+    <div className="mx-auto max-w-6xl space-y-6 px-4 py-8">
+      <h1 className="text-3xl font-bold tracking-tight text-forest-900">{t("field.title")}</h1>
+      <Suspense fallback={<p role="status">{t("field.loading")}</p>}>
+        <FieldFlow />
+      </Suspense>
+    </div>
+  );
 }

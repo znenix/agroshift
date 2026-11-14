@@ -148,3 +148,15 @@ Small implementation choices taken without asking (CLAUDE.md §1.2), one line ea
 
 **grid.json**
 - **Per-cell indicators** over the usable years 2006–2025: mean heat days ≥ 35 and ≥ 40 °C, frost-free days, aridity (Σ P / Σ ET0), mean rain, and the rain trend (Sen's slope per decade with the Mann–Kendall p-value).
+
+## Phase 3 — UI (2026-11-14)
+
+- **Flow state in the URL.** `/field?farm=&step=` via `history.pushState`, so a step can be linked and Back works; answers are kept per farm in memory (not persisted).
+- **Default answers (neutral, not tuned).** Current rotation = the farm's `demo_rotation`; every priority 1; water "sometimes short"; irrigated, furrow; no allocation, contract or soil test. The presenter sets the SPEC §10 answers live.
+- **Card notes (ASSUMPTION thresholds, `src/lib/compare.ts`).** A benefit or risk is shown from 500 m³/ha water, 20 bare days, 0.1 organic-matter index and 20 erosion points; crop risks from 20 % frost-while-young and 10 % salinity loss.
+- **Frost risk on a card only for main crops.** Crop-fit frost statistics describe the main-crop season; a crop grown as a second crop has its own frost check (an exclusion), so its main-season frost share is not shown there.
+- **Indicator "Vegetation trend": no clear trend = "Watch"** (neither good nor bad), falling = concern, rising = good.
+- **"Estimated" mark.** Fallback and draft values carry a visible mark: `source.estimated` = "estimated" in en, to be "taxminiy" in uz (Phase 5). Crop-table values with `verified: false` carry it too.
+- **Timeline.** One row per cycle year inside each card (rather than one long row per rotation), so 6-year rotations stay readable; bare soil hatched; perennials drawn lighter outside their active season.
+- **Charts.** Units are in chart titles, not on the axis ticks; lines carry short direct labels (Max, Min, ET0) plus a legend; every chart has a table view.
+- **Mobile check.** Headless Edge enforces a minimum window width of about 500 px, so the layout was checked at 500 px; a true 360 px check needs device emulation (to do before the demo).
