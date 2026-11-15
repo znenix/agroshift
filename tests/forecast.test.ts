@@ -11,8 +11,11 @@ import {
   fungalSensitiveCrops,
   openMeteoForecastSchema,
   openMeteoForecastUrl,
+  receivedHourly,
   roundForecastCoord,
   skyOf,
+  unavailableGroups,
+  variablesToDrop,
   soilStateOf,
   type ForecastDay,
 } from "@/lib/forecast";
@@ -64,7 +67,7 @@ describe("forecast: request and response", () => {
     const first = days[0];
     expect(first?.rainProbPct).toBe(parsed.daily.precipitation_probability_max[0]);
     // Daily means of the 24 local hours of the first day.
-    const hours = parsed.hourly.relative_humidity_2m.slice(0, 24).map((v) => v ?? NaN);
+    const hours = (parsed.hourly?.relative_humidity_2m ?? []).slice(0, 24).map((v) => v ?? NaN);
     expect(first?.humidityPct).toBe(Math.round(hours.reduce((a, b) => a + b, 0) / 24));
     for (const d of days) {
       expect(d.soilMoisture).not.toBeNull();
@@ -72,7 +75,7 @@ describe("forecast: request and response", () => {
       expect(d.soilMoisture ?? 2).toBeLessThanOrEqual(1);
     }
     // What /api/forecast returns passes the browser-side schema.
-    expect(forecastResponseSchema.safeParse({ version: 1, lat: 38.87, lon: 65.73, grid: { lat: 38.9, lon: 65.7, elevation_m: 370 }, retrieved: "2026-11-15T10:00:00Z", days }).success).toBe(true);
+    expect(forecastResponseSchema.safeParse({ version: 1, lat: 38.87, lon: 65.73, grid: { lat: 38.9, lon: 65.7, elevation_m: 370 }, retrieved: "2026-11-15T10:00:00Z", stale: false, unavailable: [], days }).success).toBe(true);
   });
 
   it("rejects a response with wrong units or arrays of different lengths", () => {
@@ -83,18 +86,43 @@ describe("forecast: request and response", () => {
 
   it("weights the soil layers by thickness (1, 2 and 6 cm) and leaves a day with too few hours unknown", () => {
     const parsed = openMeteoForecastSchema.parse(raw);
-    const n = parsed.hourly.time.length;
+    const base = parsed.hourly;
+    if (base === undefined) throw new Error("fixture has hourly values");
+    const n = base.time.length;
     const hourly = {
-      ...parsed.hourly,
+      ...base,
       soil_moisture_0_to_1cm: Array<number>(n).fill(0.09),
       soil_moisture_1_to_3cm: Array<number>(n).fill(0.18),
       soil_moisture_3_to_9cm: Array<number>(n).fill(0.36),
-      cloud_cover: parsed.hourly.cloud_cover.map((v, i) => (i < 24 && i % 4 === 0 ? null : v)),
+      cloud_cover: (base.cloud_cover ?? []).map((v, i) => (i < 24 && i % 4 === 0 ? null : v)),
     };
     const days = forecastDays({ ...parsed, hourly });
     expect(days[0]?.soilMoisture).toBe(0.29); // (0.09·1 + 0.18·2 + 0.36·6) / 9
     expect(days[0]?.cloudPct).toBeNull(); // 18 of 24 hours
     expect(days[1]?.cloudPct).not.toBeNull();
+  });
+});
+
+describe("forecast: variables the service does not provide", () => {
+  it("after a 400, drops the variables named in the reason, else the soil-moisture variables", () => {
+    const all = ["cloud_cover", "relative_humidity_2m", "soil_moisture_0_to_1cm", "soil_moisture_1_to_3cm", "soil_moisture_3_to_9cm"] as const;
+    expect(variablesToDrop("Cannot initialize SurfaceVariable from invalid String value soil_moisture_3_to_9cm.", all)).toEqual(["soil_moisture_3_to_9cm"]);
+    expect(variablesToDrop("Parameter hourly is invalid", all)).toEqual(["soil_moisture_0_to_1cm", "soil_moisture_1_to_3cm", "soil_moisture_3_to_9cm"]);
+    expect(variablesToDrop("anything", ["cloud_cover"])).toEqual([]);
+  });
+
+  it("a response without soil moisture still gives 14 days, with soil moisture null and listed as not available", () => {
+    const parsed = openMeteoForecastSchema.parse(raw);
+    const hourly = { ...parsed.hourly, soil_moisture_0_to_1cm: undefined, soil_moisture_1_to_3cm: undefined, soil_moisture_3_to_9cm: undefined };
+    const units = { ...parsed.hourly_units, soil_moisture_0_to_1cm: undefined, soil_moisture_1_to_3cm: undefined, soil_moisture_3_to_9cm: undefined };
+    const reduced = openMeteoForecastSchema.parse(JSON.parse(JSON.stringify({ ...parsed, hourly, hourly_units: units })));
+    const days = forecastDays(reduced);
+    expect(days).toHaveLength(14);
+    expect(days.every((d) => d.soilMoisture === null && d.humidityPct !== null)).toBe(true);
+    expect(unavailableGroups(receivedHourly(reduced))).toEqual(["soil_moisture"]);
+    expect(unavailableGroups(receivedHourly(parsed))).toEqual([]);
+    // No soil moisture → no irrigation alert can fire.
+    expect(forecastAlerts(days, { sensitiveCrops: [], irrigated: true })).toEqual([]);
   });
 });
 

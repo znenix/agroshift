@@ -20,9 +20,19 @@ import {
 import { daySummary, forecastAlerts, fungalSensitiveCrops, type ForecastDay, type ForecastResponse } from "@/lib/forecast";
 import { cropName, isoDayMonth } from "@/lib/format";
 import { formatNumber, LOCALE_TAGS, type Locale, type TranslateFn } from "@/lib/i18n";
-import { loadForecast } from "@/lib/staticdata";
+import { ForecastError, loadForecast } from "@/lib/staticdata";
 
-type Load = { status: "loading" } | { status: "error" } | { status: "ready"; value: ForecastResponse };
+type Load = { status: "loading" } | { status: "error"; reason: ForecastError["reason"] } | { status: "ready"; value: ForecastResponse };
+
+/** The extra sentence after "forecast unavailable", by the route's reason. */
+function reasonKey(reason: ForecastError["reason"]) {
+  if (reason === "rate_limited") return "forecast.reason.rate_limited" as const;
+  if (reason === "timeout" || reason === "client_timeout") return "forecast.reason.timeout" as const;
+  return "forecast.reason.other" as const;
+}
+
+const formatTime = (iso: string, locale: Locale) =>
+  new Intl.DateTimeFormat(LOCALE_TAGS[locale], { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Tashkent" }).format(new Date(iso));
 
 export function StepForecast({
   lat,
@@ -42,7 +52,7 @@ export function StepForecast({
     let live = true;
     loadForecast(lat, lon).then(
       (value) => live && setLoad({ status: "ready", value }),
-      () => live && setLoad({ status: "error" }),
+      (error: unknown) => live && setLoad({ status: "error", reason: error instanceof ForecastError ? error.reason : "unknown" }),
     );
     return () => {
       live = false;
@@ -75,7 +85,9 @@ export function StepForecast({
       )}
       {load.status === "error" && (
         <div role="alert" className="flex flex-wrap items-center gap-3 rounded-md border border-sand-300 bg-white px-4 py-3">
-          <span>{t("forecast.unavailable")}</span>
+          <span>
+            {t("forecast.unavailable")} {t(reasonKey(load.reason))}
+          </span>
           <button
             type="button"
             onClick={() => {
@@ -90,6 +102,16 @@ export function StepForecast({
       )}
       {load.status === "ready" && (
         <>
+          {load.value.stale && (
+            <p role="status" className="rounded-md border border-status-warning bg-status-warning/15 px-3 py-2">
+              {t("forecast.stale", { time: formatTime(load.value.retrieved, locale) })}
+            </p>
+          )}
+          {load.value.unavailable.length > 0 && (
+            <p className="rounded-md border border-sand-300 bg-white px-3 py-2">
+              {t("forecast.not_available", { list: load.value.unavailable.map((g) => t(`forecast.group.${g}`)).join(", ") })}
+            </p>
+          )}
           <Alerts days={load.value.days} sensitive={sensitive} irrigated={irrigated} />
           <section aria-labelledby="days-title" className="space-y-3">
             <h3 id="days-title" className="text-xl font-semibold text-forest-900">
@@ -104,7 +126,7 @@ export function StepForecast({
               {t("forecast.grid", {
                 lat: load.value.grid.lat.toFixed(2),
                 lon: load.value.grid.lon.toFixed(2),
-                time: new Intl.DateTimeFormat(LOCALE_TAGS[locale], { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Tashkent" }).format(new Date(load.value.retrieved)),
+                time: formatTime(load.value.retrieved, locale),
               })}
             </p>
           </section>

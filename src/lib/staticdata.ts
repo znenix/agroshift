@@ -13,7 +13,7 @@ import {
   type FarmFile,
   type RegionsFile,
 } from "./datafiles";
-import { forecastResponseSchema, type ForecastResponse } from "./forecast";
+import { forecastFailureSchema, forecastResponseSchema, roundForecastCoord, type ForecastFailure, type ForecastResponse } from "./forecast";
 import { pointDataSchema, type PointData } from "./point";
 
 export async function fetchStatic<T>(path: string, schema: z.ZodType<T>, fetchImpl: typeof fetch = fetch): Promise<T> {
@@ -67,16 +67,41 @@ export async function loadPoint(lat: number, lon: number, fetchImpl: typeof fetc
   return parsed.data;
 }
 
-/** Browser-side limit for /api/forecast: the route itself gives the upstream 8 s. */
-const FORECAST_CLIENT_TIMEOUT_MS = 12_000;
+/** Browser-side limit for /api/forecast: the route gives each upstream try 8 s and may retry once. */
+const FORECAST_CLIENT_TIMEOUT_MS = 22_000;
 
-/** The 14-day Open-Meteo forecast for a point, from our own route; any failure throws (the UI says "unavailable"). */
+/** A failed forecast load; `reason` is the route's explanation when it gave one. */
+export class ForecastError extends Error {
+  constructor(
+    readonly reason: ForecastFailure | "client_timeout" | "unknown",
+    message: string,
+  ) {
+    super(message);
+    this.name = "ForecastError";
+  }
+}
+
+const forecastErrorBodySchema = z.object({ error: z.object({ reason: forecastFailureSchema.optional() }) });
+
+/**
+ * The 14-day Open-Meteo forecast for a point, from our own route; any failure throws a ForecastError (the UI
+ * says "unavailable"). Coordinates are rounded like the route, so every visitor of a farm shares one CDN entry.
+ */
 export async function loadForecast(lat: number, lon: number, fetchImpl: typeof fetch = fetch): Promise<ForecastResponse> {
-  const response = await fetchImpl(`/api/forecast?lat=${lat}&lon=${lon}`, {
-    headers: { Accept: "application/json" },
-    signal: AbortSignal.timeout(FORECAST_CLIENT_TIMEOUT_MS),
-  });
-  if (!response.ok) throw new Error(`/api/forecast: HTTP ${response.status}`);
+  let response: Response;
+  try {
+    response = await fetchImpl(`/api/forecast?lat=${roundForecastCoord(lat)}&lon=${roundForecastCoord(lon)}`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(FORECAST_CLIENT_TIMEOUT_MS),
+    });
+  } catch (error) {
+    const timeout = error instanceof Error && (error.name === "TimeoutError" || error.name === "AbortError");
+    throw new ForecastError(timeout ? "client_timeout" : "unknown", error instanceof Error ? error.message : String(error));
+  }
+  if (!response.ok) {
+    const body = forecastErrorBodySchema.safeParse(await response.json().catch(() => null));
+    throw new ForecastError(body.success ? (body.data.error.reason ?? "unknown") : "unknown", `/api/forecast: HTTP ${response.status}`);
+  }
   const parsed = forecastResponseSchema.safeParse(await response.json());
   if (!parsed.success) throw new Error("/api/forecast: unexpected response format");
   return parsed.data;

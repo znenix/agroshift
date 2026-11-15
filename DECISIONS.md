@@ -260,3 +260,14 @@ Small implementation choices taken without asking (CLAUDE.md §1.2), one line ea
   - The note says model soil moisture is not a field measurement and may not reflect irrigation.
   - The "Weather data by Open-Meteo.com" link and CC BY 4.0 sit next to the data, and the hourly-to-daily change is stated.
   - The About page lists the source; its citation was checked on DataCite.
+- **Forecast robustness (2026-11-15, after "forecast unavailable" on the deployed site).** The failure did not reproduce: the deployed /api/forecast answered 200 for all demo farms. The old route turned every upstream problem into one anonymous 502, so the cause cannot be known.
+  - The likely cause, not proven, is a 429 rate limit on the shared Vercel IP or a slow answer.
+  - The route now logs each upstream problem as one JSON line (status, ms, first 300 characters of the body). No secrets exist to log.
+  - Each case is handled on its own:
+    - 400: drop the hourly variables the reason names (else soil moisture), retry once, and show them as "not available".
+    - 429: wait 1 s, retry once.
+    - Timeout: 8 s per request, no retry.
+  - A good forecast is cached for 1 hour per rounded point, in function memory and on the CDN (`s-maxage=3600`).
+  - The browser now rounds to 0.01° as well, so every visitor of a farm uses the same CDN entry.
+  - When the service fails and a good forecast of the last 6 hours exists, that one is shown, marked "last forecast received (fetched …)" (ASSUMPTION: 6 h).
+  - The browser waits up to 22 s, because the route may make two tries of 8 s each.

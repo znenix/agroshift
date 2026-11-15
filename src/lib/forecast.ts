@@ -22,7 +22,19 @@ import {
 } from "./constants";
 
 const DAILY = ["precipitation_sum", "precipitation_probability_max", "temperature_2m_max", "temperature_2m_min", "et0_fao_evapotranspiration"] as const;
-const HOURLY = ["cloud_cover", "relative_humidity_2m", "soil_moisture_0_to_1cm", "soil_moisture_1_to_3cm", "soil_moisture_3_to_9cm"] as const;
+export const HOURLY_VARIABLES = ["cloud_cover", "relative_humidity_2m", "soil_moisture_0_to_1cm", "soil_moisture_1_to_3cm", "soil_moisture_3_to_9cm"] as const;
+export type HourlyVariable = (typeof HOURLY_VARIABLES)[number];
+/** What the user is told is missing when the service rejects or omits an hourly variable. */
+export const forecastGroupSchema = z.enum(["cloud", "humidity", "soil_moisture"]);
+export type ForecastGroup = z.infer<typeof forecastGroupSchema>;
+const GROUP_OF: Readonly<Record<HourlyVariable, ForecastGroup>> = {
+  cloud_cover: "cloud",
+  relative_humidity_2m: "humidity",
+  soil_moisture_0_to_1cm: "soil_moisture",
+  soil_moisture_1_to_3cm: "soil_moisture",
+  soil_moisture_3_to_9cm: "soil_moisture",
+};
+const SOIL_MOISTURE_VARIABLES: readonly HourlyVariable[] = ["soil_moisture_0_to_1cm", "soil_moisture_1_to_3cm", "soil_moisture_3_to_9cm"];
 /** Layer thicknesses (cm) for the 0–9 cm depth-weighted soil moisture. */
 const SOIL_LAYERS = [
   { key: "soil_moisture_0_to_1cm", cm: 1 },
@@ -32,12 +44,40 @@ const SOIL_LAYERS = [
 
 export const roundForecastCoord = (v: number): number => Math.round(v * 10 ** FORECAST_POINT_DECIMALS) / 10 ** FORECAST_POINT_DECIMALS;
 
-export function openMeteoForecastUrl(lat: number, lon: number): string {
+export function openMeteoForecastUrl(lat: number, lon: number, hourly: readonly HourlyVariable[] = HOURLY_VARIABLES): string {
   return (
     `${OPEN_METEO_FORECAST_URL}?latitude=${lat}&longitude=${lon}` +
-    `&daily=${DAILY.join(",")}&hourly=${HOURLY.join(",")}` +
+    `&daily=${DAILY.join(",")}` +
+    (hourly.length > 0 ? `&hourly=${hourly.join(",")}` : "") +
     `&forecast_days=${FORECAST_DAYS}&timezone=${encodeURIComponent(FORECAST_TIMEZONE)}`
   );
+}
+
+/** Why /api/forecast could not give a forecast (logged, and returned as `error.reason`). */
+export const forecastFailureSchema = z.enum(["bad_request", "rate_limited", "timeout", "upstream_error", "invalid_response"]);
+export type ForecastFailure = z.infer<typeof forecastFailureSchema>;
+
+/** Open-Meteo's error body, e.g. {"error": true, "reason": "Cannot initialize SurfaceAndPressureVariable from invalid String value ..."}. */
+export const openMeteoErrorSchema = z.object({ reason: z.string() });
+
+/**
+ * After a 400 (bad parameter): the hourly variables to drop before one retry. Variables named in the reason
+ * go first; if none is named, the soil-moisture variables (the least widely supported) are dropped.
+ */
+export function variablesToDrop(reason: string, requested: readonly HourlyVariable[]): HourlyVariable[] {
+  const named = requested.filter((v) => reason.includes(v));
+  if (named.length > 0) return named;
+  return requested.filter((v) => SOIL_MOISTURE_VARIABLES.includes(v));
+}
+
+/** Groups the user is told are not available, given the hourly variables that were actually received. */
+export function unavailableGroups(received: readonly HourlyVariable[]): ForecastGroup[] {
+  const groups: ForecastGroup[] = [];
+  for (const v of HOURLY_VARIABLES) {
+    const g = GROUP_OF[v];
+    if (!received.includes(v) && !groups.includes(g)) groups.push(g);
+  }
+  return groups;
 }
 
 const values = z.array(z.number().nullable());
@@ -52,7 +92,16 @@ export const openMeteoForecastSchema = z
     elevation: z.number().optional(),
     timezone: z.string(),
     daily_units: z.object({ precipitation_sum: z.literal("mm"), precipitation_probability_max: z.literal("%"), temperature_2m_max: z.literal("°C"), temperature_2m_min: z.literal("°C"), et0_fao_evapotranspiration: z.literal("mm") }),
-    hourly_units: z.object({ cloud_cover: z.literal("%"), relative_humidity_2m: z.literal("%"), soil_moisture_0_to_1cm: z.literal("m³/m³"), soil_moisture_1_to_3cm: z.literal("m³/m³"), soil_moisture_3_to_9cm: z.literal("m³/m³") }),
+    /** Hourly variables are optional: a retry after a 400 asks for fewer of them. */
+    hourly_units: z
+      .object({
+        cloud_cover: z.literal("%").optional(),
+        relative_humidity_2m: z.literal("%").optional(),
+        soil_moisture_0_to_1cm: z.literal("m³/m³").optional(),
+        soil_moisture_1_to_3cm: z.literal("m³/m³").optional(),
+        soil_moisture_3_to_9cm: z.literal("m³/m³").optional(),
+      })
+      .optional(),
     daily: z.object({
       time: z.array(isoDate),
       precipitation_sum: values,
@@ -61,17 +110,23 @@ export const openMeteoForecastSchema = z
       temperature_2m_min: values,
       et0_fao_evapotranspiration: values,
     }),
-    hourly: z.object({
-      time: z.array(isoHour),
-      cloud_cover: values,
-      relative_humidity_2m: values,
-      soil_moisture_0_to_1cm: values,
-      soil_moisture_1_to_3cm: values,
-      soil_moisture_3_to_9cm: values,
-    }),
+    hourly: z
+      .object({
+        time: z.array(isoHour),
+        cloud_cover: values.optional(),
+        relative_humidity_2m: values.optional(),
+        soil_moisture_0_to_1cm: values.optional(),
+        soil_moisture_1_to_3cm: values.optional(),
+        soil_moisture_3_to_9cm: values.optional(),
+      })
+      .optional(),
   })
   .refine((r) => DAILY.every((k) => r.daily[k].length === r.daily.time.length), "daily arrays differ in length")
-  .refine((r) => HOURLY.every((k) => r.hourly[k].length === r.hourly.time.length), "hourly arrays differ in length");
+  .refine((r) => r.hourly === undefined || HOURLY_VARIABLES.every((k) => r.hourly?.[k] === undefined || r.hourly[k].length === r.hourly.time.length), "hourly arrays differ in length");
+
+/** The hourly variables present in a response (with their units). */
+export const receivedHourly = (raw: OpenMeteoForecast): HourlyVariable[] =>
+  HOURLY_VARIABLES.filter((v) => raw.hourly?.[v] !== undefined && raw.hourly_units?.[v] !== undefined);
 export type OpenMeteoForecast = z.infer<typeof openMeteoForecastSchema>;
 
 const nullableNumber = z.number().nullable();
@@ -99,6 +154,10 @@ export const forecastResponseSchema = z.object({
   grid: z.object({ lat: z.number(), lon: z.number(), elevation_m: z.number().nullable() }),
   /** When the forecast was fetched (ISO timestamp). */
   retrieved: z.string(),
+  /** True when the service failed just now and the last good forecast (at most a few hours old) is shown. */
+  stale: z.boolean(),
+  /** Hourly groups the service did not provide this time (shown as "not available"). */
+  unavailable: z.array(forecastGroupSchema),
   days: z.array(forecastDaySchema),
 });
 export type ForecastResponse = z.infer<typeof forecastResponseSchema>;
@@ -107,10 +166,13 @@ export type ForecastResponse = z.infer<typeof forecastResponseSchema>;
 const MIN_HOURS = 20;
 const round = (v: number | null, digits: number) => (v === null ? null : Math.round(v * 10 ** digits) / 10 ** digits);
 
-function dailyMean(raw: OpenMeteoForecast, date: string, key: (typeof HOURLY)[number]): number | null {
+function dailyMean(raw: OpenMeteoForecast, date: string, key: HourlyVariable): number | null {
+  const hourly = raw.hourly;
+  const series = hourly?.[key];
+  if (hourly === undefined || series === undefined || raw.hourly_units?.[key] === undefined) return null;
   const vals: number[] = [];
-  raw.hourly.time.forEach((t, i) => {
-    const v = raw.hourly[key][i];
+  hourly.time.forEach((t, i) => {
+    const v = series[i];
     if (t.startsWith(date) && v !== null && v !== undefined) vals.push(v);
   });
   return vals.length < MIN_HOURS ? null : vals.reduce((a, b) => a + b, 0) / vals.length;
