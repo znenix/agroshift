@@ -14,6 +14,7 @@ import type { CropFit, FitCategory, Reason } from "@/lib/crops";
 import { cropName, dayMonth, isoDayMonth, reasonParams, rotationName } from "@/lib/format";
 import { formatNumber, type MessageKey } from "@/lib/i18n";
 import type { IndicatorStatus } from "@/lib/indicators";
+import { ndviDemoOnly } from "@/lib/point";
 import type { RankedRotation } from "@/lib/ranking";
 import type { RotationEvaluation } from "@/lib/rotations";
 import { RotationTimeline } from "./RotationTimeline";
@@ -122,7 +123,7 @@ function SatelliteBanner({ profile, analysis }: { profile: FieldProfile; analysi
         <SourceChip source="modis-ornl" refs={profile.farm.sources} />
       </div>
       {check === null ? (
-        <p>{t("satellite.unavailable")}</p>
+        <p>{t(ndviDemoOnly(profile.farm) ? "point.demo_only.satellite" : "satellite.unavailable")}</p>
       ) : agree ? (
         <p className="font-medium">{t("satellite.agree", { from: String(check.years[0] ?? ""), to: String(check.years.at(-1) ?? "") })}</p>
       ) : (

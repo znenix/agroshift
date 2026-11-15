@@ -4,7 +4,7 @@
  * The /field flow (SPEC §2): choose field → field conditions → your farm → compare rotations → stress test. State
  * lives in the URL (?farm=&step= for a demo farm, ?lat=&lon=&step= for a map point) so a step can be
  * linked and the back button works. All engines run in the browser (SPEC §4.3): demo farms come from
- * static files, map points from the static climate cell plus /api/point.
+ * static files, map points from prepared data only: the static climate cell and the region (lib/point.ts).
  */
 import { useSearchParams } from "next/navigation";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
@@ -12,12 +12,14 @@ import { useI18n } from "@/components/I18nProvider";
 import { analyze, buildProfile, soilConditions, type FarmAnswers, type FieldProfile } from "@/lib/analysis";
 import { CROPS, ROTATION_TEMPLATES } from "@/lib/catalog";
 import { NORMAL_SCENARIO, type Scenario } from "@/lib/climate";
-import type { RegionsFile } from "@/lib/datafiles";
+import type { BoundariesFile, RegionsFile } from "@/lib/datafiles";
+import { todayIso } from "@/lib/dates";
 import type { MessageKey, TranslateFn } from "@/lib/i18n";
 import { fieldIndicators } from "@/lib/indicators";
-import { pointSite, pointSiteId, roundCoord, type PointGap } from "@/lib/point";
-import { ApiError, loadCell, loadFarm, loadPoint, loadRegions } from "@/lib/staticdata";
-import { StepChoose, type DemoFarm } from "./StepChoose";
+import { powerCellFor } from "@/lib/geo";
+import { cellDistanceKm, pointSite, pointSiteId, preparedPointData, regionOfPoint, roundCoord, type PointGap } from "@/lib/point";
+import { ApiError, loadBoundaries, loadCell, loadFarm, loadRegions } from "@/lib/staticdata";
+import { StepChoose, type DemoFarm, type PointInfo, type PointVia } from "./StepChoose";
 import { StepCompare } from "./StepCompare";
 import { StepConditions } from "./StepConditions";
 import { StepFarm } from "./StepFarm";
@@ -67,20 +69,24 @@ interface Loaded {
 
 const messageOf = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
-/** User-facing text for a loading error; /api/point codes get their own sentence. */
+/** User-facing text for a loading error; point codes get their own sentence. */
 function errorText(t: TranslateFn, load: { message: string; code?: string }): string {
   if (load.code === "outside_uzbekistan") return t("map.error.outside");
   if (load.code === "invalid_point") return t("map.error.invalid");
   return t("field.error", { message: load.message });
 }
 
-async function loadSite(site: Site, regions: RegionsFile): Promise<Loaded> {
+async function loadSite(site: Site, regions: RegionsFile, boundaries: BoundariesFile | null): Promise<Loaded> {
   const salinityOf = (region: string) => regions.regions.find((r) => r.id === region)?.salinity ?? null;
   if (site.kind === "demo") {
     const farm = await loadFarm(site.farm.id);
     return { profile: buildProfile(farm, salinityOf(farm.region)), gaps: [] };
   }
-  const point = await loadPoint(site.lat, site.lon);
+  // Prepared data only: no live ORNL/SoilGrids call for a map point (lib/point.ts).
+  if (boundaries === null) throw new Error("boundaries not loaded");
+  const regionId = regionOfPoint(site, boundaries);
+  if (regionId === null) throw new ApiError("outside_uzbekistan", "The point is outside Uzbekistan.");
+  const point = preparedPointData(site, regionId, todayIso());
   const cell = await loadCell(point.cell);
   const region = regions.regions.find((r) => r.id === point.region);
   const names = region?.names ?? { uz: point.region, ru: point.region, en: point.region };
@@ -141,6 +147,20 @@ export function FieldFlow() {
     };
   }, []);
 
+  const [boundaries, setBoundaries] = useState<Load<BoundariesFile>>({ status: "loading" });
+  useEffect(() => {
+    let live = true;
+    loadBoundaries().then(
+      (value) => live && setBoundaries({ status: "ready", value }),
+      (error: unknown) => live && setBoundaries({ status: "error", message: messageOf(error) }),
+    );
+    return () => {
+      live = false;
+    };
+  }, []);
+  /** Step 1 message for a point that cannot be used (outside Uzbekistan). */
+  const [pointNotice, setPointNotice] = useState<PointVia | null>(null);
+
   const farms = regions.status === "ready" ? regions.value.demo_farms : [];
   const demoFarm = farms.find((f) => f.id === farmParam) ?? null;
   const site = useMemo((): Site | null => {
@@ -155,9 +175,11 @@ export function FieldFlow() {
   const [loads, setLoads] = useState<Readonly<Record<string, Load<Loaded> & { code?: string }>>>({});
   useEffect(() => {
     if (site === null || regions.status !== "ready" || loads[site.key] !== undefined) return;
+    // A map point needs the outlines to find its region (a load error is shown below).
+    if (site.kind === "point" && boundaries.status !== "ready") return;
     const key = site.key;
     let live = true;
-    loadSite(site, regions.value).then(
+    loadSite(site, regions.value, boundaries.status === "ready" ? boundaries.value : null).then(
       (value) => live && setLoads((l) => ({ ...l, [key]: { status: "ready", value } })),
       (error: unknown) =>
         live &&
@@ -166,7 +188,7 @@ export function FieldFlow() {
     return () => {
       live = false;
     };
-  }, [site, regions, loads]);
+  }, [site, regions, boundaries, loads]);
 
   const [answersBySite, setAnswersBySite] = useState<Readonly<Record<string, FarmAnswers>>>({});
   const defaults = useMemo(() => (site === null ? null : defaultAnswers(site.defaultRotation)), [site]);
@@ -194,6 +216,23 @@ export function FieldFlow() {
     return s === NORMAL_SCENARIO ? analysis : analyze(profile, CROPS, ROTATION_TEMPLATES, deferredAnswers, s);
   }, [analysis, profile, deferredAnswers, debouncedScenario, step]);
   const scenarioPending = scenario.deltaT !== debouncedScenario.deltaT || scenario.rainFactor !== debouncedScenario.rainFactor;
+
+  const pointInfo = useMemo((): PointInfo | null => {
+    if (site?.kind !== "point" || boundaries.status !== "ready" || regions.status !== "ready") return null;
+    const regionId = regionOfPoint(site, boundaries.value);
+    const region = regions.value.regions.find((r) => r.id === regionId);
+    return { lat: site.lat, lon: site.lon, regionNames: region?.names ?? null, cell: powerCellFor(site).id, km: cellDistanceKm(site) };
+  }, [site, boundaries, regions]);
+
+  /** A map click, the browser's location or typed coordinates: outside Uzbekistan stays on step 1 with a message. */
+  const choosePoint = (lat: number, lon: number, via: PointVia) => {
+    if (boundaries.status === "ready" && regionOfPoint({ lat, lon }, boundaries.value) === null) {
+      setPointNotice(via);
+      return;
+    }
+    setPointNotice(null);
+    navigate({ point: { lat, lon }, step: 2 });
+  };
 
   const go = (n: number) =>
     navigate({ ...(site?.kind === "demo" ? { farm: site.key } : {}), ...(site?.kind === "point" ? { point: site } : {}), step: n });
@@ -230,13 +269,19 @@ export function FieldFlow() {
           farms={farms}
           selectedId={demoFarm?.id ?? null}
           point={site?.kind === "point" ? site : null}
-          onChoose={(id) => navigate({ farm: id, step: 2 })}
-          onPoint={(lat, lon) => navigate({ point: { lat, lon }, step: 2 })}
+          pointInfo={pointInfo}
+          notice={pointNotice}
+          onChoose={(id) => {
+            setPointNotice(null);
+            navigate({ farm: id, step: 2 });
+          }}
+          onPoint={choosePoint}
         />
       )}
 
       {step > 1 && loaded?.status === "error" && <ErrorBox message={errorText(t, loaded)} />}
-      {step > 1 && (loaded === undefined || loaded.status === "loading") && (
+      {step > 1 && site?.kind === "point" && boundaries.status === "error" && <ErrorBox message={t("field.error", { message: boundaries.message })} />}
+      {step > 1 && !(site?.kind === "point" && boundaries.status === "error") && (loaded === undefined || loaded.status === "loading") && (
         <Skeleton label={t(site?.kind === "point" ? "map.loading_point" : "field.loading")} visible={site?.kind === "point"} />
       )}
 

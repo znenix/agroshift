@@ -1,7 +1,9 @@
 /**
- * Any point inside Uzbekistan (SPEC §2 step 1, §8). /api/point fetches land cover, the last NDVI
- * seasons, soil and slope; the browser joins them with the point's static climate cell into a SiteFile
- * for the engines. Pure functions, shared by the route handler, the browser and tests.
+ * Any point inside Uzbekistan (SPEC §2 step 1, §8). The app uses only data that is already prepared
+ * (team decision 2026-11-15): the point's static POWER climate cell and its region's salinity estimate.
+ * Soil, NDVI, land cover and slope exist for the demo farms only, so for a map point they are
+ * information gaps — never values borrowed from another farm. /api/point (live ORNL/SoilGrids calls)
+ * is kept for later but is not called by the app. Pure functions, shared by the browser and tests.
  */
 import { z } from "zod";
 import { CLIMATOLOGY_LAST_YEAR, CROPLAND_CLASSES, IGBP_CLASSES, MODIS_WINDOW_KM, NDVI_RECENT_YEARS } from "./constants";
@@ -17,6 +19,7 @@ import {
   type SiteFile,
   type SourceRef,
 } from "./datafiles";
+import { haversineKm, pointInGeometry, powerCellFor, type AreaGeometry, type LatLon } from "./geo";
 import { chunkDates, classMask, gridOf, ndviComposites, summarizeClasses, type OrnlSubset } from "./modis";
 import { topsoilValues, type SoilGridsResponse } from "./soil";
 
@@ -25,8 +28,20 @@ export const POINT_DECIMALS = 3;
 export const roundCoord = (v: number): number => Math.round(v * 10 ** POINT_DECIMALS) / 10 ** POINT_DECIMALS;
 export const pointSiteId = (lat: number, lon: number): string => `point_${roundCoord(lat).toFixed(POINT_DECIMALS)}_${roundCoord(lon).toFixed(POINT_DECIMALS)}`;
 
-/** What could not be fetched or used for this point; each becomes a visible information gap. */
-export const pointGapSchema = z.enum(["land_cover", "ndvi", "not_cropland", "soil", "terrain"]);
+/**
+ * What could not be fetched or used for this point; each becomes a visible information gap. The
+ * `*_demo_only` gaps mean "not prepared for this point yet — available for the demo farms".
+ */
+export const pointGapSchema = z.enum([
+  "land_cover",
+  "ndvi",
+  "not_cropland",
+  "soil",
+  "terrain",
+  "ndvi_demo_only",
+  "soil_demo_only",
+  "terrain_demo_only",
+]);
 export type PointGap = z.infer<typeof pointGapSchema>;
 
 export const pointDataSchema = z.object({
@@ -163,3 +178,50 @@ export function pointSite(data: PointData, cell: CellFile, regionNames: SiteFile
   });
 }
 
+
+/** The outlines a point is located with (public/data/boundaries.json). */
+export interface PointOutlines {
+  country: AreaGeometry;
+  regions: ReadonlyArray<{ id: string; geometry: AreaGeometry }>;
+}
+
+/**
+ * The ADM1 region containing the point, or `null` when it is outside Uzbekistan (or in a sliver of the
+ * simplified outline that no region covers, which is treated the same way).
+ */
+export function regionOfPoint(p: LatLon, outlines: PointOutlines): string | null {
+  if (!Number.isFinite(p.lat) || !Number.isFinite(p.lon) || !pointInGeometry(p, outlines.country)) return null;
+  return outlines.regions.find((r) => pointInGeometry(p, r.geometry))?.id ?? null;
+}
+
+/** Distance from the point to the centre of its native NASA POWER cell (the point's climate is that cell's). */
+export const cellDistanceKm = (p: LatLon): number => haversineKm(p, powerCellFor(p));
+
+/** The gaps every map point has: only the demo farms have prepared soil, NDVI and slope. */
+export const PREPARED_ONLY_GAPS: readonly PointGap[] = ["ndvi_demo_only", "soil_demo_only", "terrain_demo_only"];
+
+/**
+ * A map point from prepared data only: its climate cell and region; soil, land cover, NDVI and slope are
+ * gaps. No network call is made, and nothing is copied from a nearby demo farm.
+ */
+export function preparedPointData(p: LatLon, region: string, today: string): PointData {
+  const lat = roundCoord(p.lat);
+  const lon = roundCoord(p.lon);
+  return pointDataSchema.parse({
+    version: 1,
+    lat,
+    lon,
+    region,
+    cell: powerCellFor({ lat, lon }).id,
+    retrieved: today,
+    land_cover: null,
+    ndvi: null,
+    soil: pointSoil(null),
+    terrain: null,
+    sources: [],
+    gaps: [...PREPARED_ONLY_GAPS],
+  });
+}
+
+/** True when this site's satellite data is a "demo farms only" gap (a map point, not a failed download). */
+export const ndviDemoOnly = (site: SiteFile): boolean => isPointSite(site) && site.ndvi.composites.length === 0;

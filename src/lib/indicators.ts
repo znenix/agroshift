@@ -134,7 +134,7 @@ export function fieldIndicators(profile: FieldProfile, soil: SoilConditions): In
       explanation: ndvi === null ? "indicator.vegetation_unknown" : VEGETATION_EXPLANATION[ndvi.direction],
       params: { from: profile.farm.ndvi.period.start.slice(0, 4), years: ndvi?.n ?? 0 },
       source: "modis-ornl",
-      confidence: "medium",
+      confidence: ndvi === null ? "low" : "medium",
     },
     {
       id: "ph",
@@ -201,7 +201,7 @@ export function fieldIndicators(profile: FieldProfile, soil: SoilConditions): In
       explanation: slope === null ? "indicator.slope_unknown" : "indicator.slope",
       params: { slope: slope ?? "–" },
       source: slope === null ? null : "copernicus-dem",
-      confidence: "medium",
+      confidence: slope === null ? "low" : "medium",
     },
   ];
 }

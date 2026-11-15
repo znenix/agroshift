@@ -219,3 +219,16 @@ Small implementation choices taken without asking (CLAUDE.md §1.2), one line ea
   - Kulmatov (2014) does not name it.
   - Doniyorov & Kuvatov (2024, doi:10.25077/aijans.v5.i2.58-64.2024) describe one moderately saline trial site, not the region.
   - Matyakubov et al. (2025, BIO Web of Conferences 151, 04021, doi:10.1051/bioconf/202515104021) may hold regional figures, but the publisher returned HTTP 403, so it was not read.
+
+## "Any point" mode (2026-11-15, team request)
+
+- **Map points use prepared data only.** No live ORNL or SoilGrids call:
+  - Climate: the point's native POWER cell (static file).
+  - Region: point-in-polygon on the simplified ADM1 outlines in `public/data/boundaries.json`.
+  - Salinity: that region's entry, or unknown.
+  - Soil, land cover, NDVI, the satellite check and slope are "not available for this point yet — available for demo farms" gaps. Nothing is copied from a nearby demo farm.
+  - `/api/point` stays in the code but is no longer called.
+- **Entry points.** On step 1: a map click, "My location" (browser geolocation, asked only on click) and typed coordinates. A point outside Uzbekistan stays on step 1 with a message. A point in a sliver of the simplified outline that no region covers is treated as outside. Denied, unavailable, timed-out and unsupported geolocation each get their own sentence.
+- **Missing slope.** Without slope, erosion is computed as for flat ground and the steep-slope check is skipped. This was already the behaviour when slope could not be fetched; the gap text now says so.
+- **Confidence.** The vegetation-trend and slope indicators drop to "low" when their input is missing. Soil and salinity were already low, so demo farms are unaffected.
+- **Location line.** It shows the region name and the distance from the point to its POWER cell's centre (at most about 40 km).

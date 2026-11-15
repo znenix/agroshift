@@ -3,7 +3,16 @@
  * fetches these and our own /api/* routes (CLAUDE.md §1.8).
  */
 import { z } from "zod";
-import { cellFileSchema, farmFileSchema, regionsFileSchema, type CellFile, type FarmFile, type RegionsFile } from "./datafiles";
+import {
+  boundariesFileSchema,
+  cellFileSchema,
+  farmFileSchema,
+  regionsFileSchema,
+  type BoundariesFile,
+  type CellFile,
+  type FarmFile,
+  type RegionsFile,
+} from "./datafiles";
 import { pointDataSchema, type PointData } from "./point";
 
 export async function fetchStatic<T>(path: string, schema: z.ZodType<T>, fetchImpl: typeof fetch = fetch): Promise<T> {
@@ -21,6 +30,10 @@ export const loadRegions = (fetchImpl?: typeof fetch): Promise<RegionsFile> =>
 export const loadFarm = (id: string, fetchImpl?: typeof fetch): Promise<FarmFile> =>
   fetchStatic(`/data/farms/${encodeURIComponent(id)}.json`, farmFileSchema, fetchImpl);
 
+/** Simplified country and region outlines, used to locate map points in the browser. */
+export const loadBoundaries = (fetchImpl?: typeof fetch): Promise<BoundariesFile> =>
+  fetchStatic("/data/boundaries.json", boundariesFileSchema, fetchImpl);
+
 export const loadCell = (id: string, fetchImpl?: typeof fetch): Promise<CellFile> =>
   fetchStatic(`/data/cells/${encodeURIComponent(id)}.json`, cellFileSchema, fetchImpl);
 
@@ -37,7 +50,10 @@ export class ApiError extends Error {
   }
 }
 
-/** Land cover, NDVI, soil and slope for a map point, from our own route (never upstream from the browser). */
+/**
+ * Land cover, NDVI, soil and slope for a map point, from our own route (never upstream from the browser).
+ * Not used by the app since 2026-11-15: map points use prepared data only (see lib/point.ts).
+ */
 export async function loadPoint(lat: number, lon: number, fetchImpl: typeof fetch = fetch): Promise<PointData> {
   const response = await fetchImpl(`/api/point?lat=${lat}&lon=${lon}`, { headers: { Accept: "application/json" } });
   const body: unknown = await response.json().catch(() => null);

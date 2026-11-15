@@ -10,7 +10,8 @@ import type { SoilConditions } from "@/lib/crops";
 import { dayMonth, monthShort } from "@/lib/format";
 import { formatNumber, type MessageKey } from "@/lib/i18n";
 import type { Indicator } from "@/lib/indicators";
-import { isPointSite, type PointGap } from "@/lib/point";
+import { haversineKm } from "@/lib/geo";
+import { isPointSite, ndviDemoOnly, type PointGap } from "@/lib/point";
 import type { TrendResult } from "@/lib/trends";
 import { DataTable } from "./DataTable";
 
@@ -66,7 +67,13 @@ export function StepConditions({
         </h2>
         <p className="text-sm text-ink-muted tabular-nums">
           {isPoint
-            ? t("conditions.location_point", { region: farm.city.names[locale], cell: farm.climate.cell.id })
+            ? t("point.where", {
+                lat: farm.point.lat.toFixed(3),
+                lon: farm.point.lon.toFixed(3),
+                region: farm.city.names[locale],
+                cell: farm.climate.cell.id,
+                km: Math.round(haversineKm(farm.point, farm.climate.cell)),
+              })
             : t("conditions.location", {
                 lat: farm.point.lat.toFixed(3),
                 lon: farm.point.lon.toFixed(3),
@@ -198,7 +205,7 @@ export function StepConditions({
           </div>
         </div>
         {!hasNdvi ? (
-          <p className="rounded-lg border border-sand-300 bg-white p-4">{t("conditions.no_satellite")}</p>
+          <p className="rounded-lg border border-sand-300 bg-white p-4">{t(ndviDemoOnly(farm) ? "point.demo_only.ndvi" : "conditions.no_satellite")}</p>
         ) : (
         <>
         <div className="rounded-lg border border-sand-300 bg-white p-4">
@@ -244,6 +251,7 @@ export function StepConditions({
           </h3>
           <p className="text-sm text-ink-muted">{t("conditions.soil_lead")}</p>
         </div>
+        {gaps.includes("soil_demo_only") && <p className="rounded-lg border border-sand-300 bg-white p-4">{t("point.demo_only.soil")}</p>}
         <IndicatorGrid indicators={indicators.filter((i) => !CLIMATE_INDICATORS.includes(i.id))} profile={profile} />
         {soil.ece === null && <p className="rounded-md bg-status-warning/15 px-3 py-2 text-sm">{t("gap.salinity")}</p>}
       </section>

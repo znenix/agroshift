@@ -9,7 +9,7 @@ Built for the NASA Space Apps Challenge 2026, challenge *Field Shift: Adapting F
 
 `/field` walks through five steps:
 
-1. **Choose field.** Pick a demo farm, click anywhere on the map, or type coordinates.
+1. **Choose field.** Pick a demo farm, click anywhere on the map, use **My location**, or type coordinates.
 2. **Field conditions.**
    - 20 years of climate (NASA POWER), heat and frost days, and long-term trends.
    - What the satellite saw on the field (MODIS NDVI, with bare periods).
@@ -64,7 +64,7 @@ The built data in `public/data/` is committed, so the app works without running 
 | `grid.json`, `regions.json`, `boundaries.json` | Cell indicators for the map layers; regions with salinity status and the demo farms; simplified outlines |
 | `meta.json` | POWER API versions and access dates of every source (shown on `/about`) |
 
-**Map points.** These are fetched live by `GET /api/point?lat&lon`, our own route. The browser never calls upstream APIs.
+**Map points.** These use prepared data only: the point's NASA POWER cell (`cells/{id}.json`) and its region's salinity estimate. Soil, NDVI, the satellite check and slope are shown as information gaps ("available for demo farms"). The app no longer calls `GET /api/point?lat&lon`, our live route; it is kept for later. The browser never calls upstream APIs.
 - **What it fetches:** land cover, the last 3 seasons of NDVI, soil and slope.
 - **Timeouts:** 8 s per upstream and 40 s overall.
 - **Failures:** whatever fails is shown as an information gap.
