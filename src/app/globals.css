@@ -80,9 +80,33 @@
     transition: opacity 400ms ease-in-out;
   }
 
+  /* Film grain over the landing landscape: 5 % strength, static. */
+  .grain {
+    opacity: 0.05;
+    mix-blend-mode: multiply;
+  }
+
+  /* Clouds cross the scene in 60–90 s (duration and start offset set per cloud). */
+  .cloud-drift {
+    animation-name: cloud-drift;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform;
+  }
+
+  @keyframes cloud-drift {
+    from {
+      transform: translateX(calc(-1 * var(--x, 0%) - 40vw));
+    }
+    to {
+      transform: translateX(calc(105vw - var(--x, 0%)));
+    }
+  }
+
   .bg-fill {
     transition:
       fill 600ms ease-in-out,
+      background-color 600ms ease-in-out,
       opacity 600ms ease-in-out,
       transform 600ms ease-in-out;
   }
@@ -96,6 +120,11 @@
     .field-backdrop-layer,
     .bg-fill {
       transition: none;
+    }
+
+    .cloud-drift {
+      animation: none;
+      will-change: auto;
     }
   }
 }

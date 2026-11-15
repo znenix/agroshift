@@ -282,3 +282,14 @@ Small implementation choices taken without asking (CLAUDE.md §1.2), one line ea
 - **Contrast.** Worst-case text contrast at 14 % is 4.63:1 (water-700 on `status-warning/25` over deep green). Every text colour was checked against every translucent surface and backdrop colour.
 - **prefers-reduced-motion.** No parallax and no transitions.
 - **Fallback.** If the SVG fails, the plain sand page remains.
+- **Art pass (2026-11-15).** The background source is now about 21 KB.
+  - **Landing, five depth layers.** Sky with a low warm sun and wide glow, two hazy far ranges (lighter and bluer, with mist at their foot), near hills shaded on the side away from the sun, the field, and a foreground rise with a sunlit crest.
+  - **Shapes.** Crop rows curve with the land and are two-tone (sunny side lit, other side in shade); the hills cast a soft long shadow to the left. Smooth curves only, no hard triangles.
+  - **Texture and motion.** Grain from feTurbulence at 5 %, static. Clouds drift in 66–90 s. Parallax is at most 30 px.
+  - **/field.** Uses the same palette and shapes: rounded patchwork lit from the top right, curved two-tone rows, contour strips, and the landscape for step 5.
+  - **Second pass after screenshot review (desktop and 360 px via DevTools device emulation).**
+    - The sun was hidden behind the ranges: it moved above the ridge, inside the phone crop, with a stronger glow.
+    - The flat ranges got mist at their foot.
+    - The dark foreground with a hard seam became lighter, with a sunlit crest.
+    - A long hill shadow was added.
+    - Clouds were too soft to read at 14 %: they got firmer bodies, a deeper sky in step 2 and darker clouds in step 6.
