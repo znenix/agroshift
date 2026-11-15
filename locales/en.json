@@ -58,7 +58,7 @@
   "about.assumption.heat": "Heat days come from regional air temperature (~50 km), which is warmer than an irrigated field, so heat is a low-confidence warning and never excludes a crop.",
   "about.assumption.efficiency": "Irrigation efficiencies, NDVI thresholds and class breaks of the map layers are documented assumptions, not measurements for a field.",
   "about.assumption.dry_year": "The \"Dry year\" preset reduces rain by 30 % on every day; the dry-year (90th percentile) irrigation need is shown separately in every scenario.",
-  "about.assumption.defaults": "Each demo farm starts from the rotation the satellite suggests, chosen by the team: Karakalpakstan cotton every year; Tashkent, Fergana and Samarkand winter wheat with a summer second crop every year; Khorezm and Surxondaryo cotton–wheat. A map point starts from cotton–wheat; every priority starts at 1. The farmer changes all of these in step 3.",
+  "about.assumption.defaults": "Each demo farm starts from the rotation the satellite suggests, chosen by the team: Karakalpakstan cotton every year; Tashkent, Fergana and Samarkand winter wheat with a summer second crop every year; Khorezm and Surxondaryo cotton–wheat; Kashkadarya three years of alfalfa, then cotton and wheat. A map point starts from cotton–wheat; every priority starts at 1. The farmer changes all of these in step 3.",
   "about.assumption.decisions": "Every decision of this kind is listed in DECISIONS.md in the code repository.",
   "about.limits.title": "Limitations",
   "about.limit.power": "NASA POWER is a reanalysis for ~50 km cells: it describes the regional climate, not your field.",

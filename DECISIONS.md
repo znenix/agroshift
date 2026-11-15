@@ -206,3 +206,16 @@ Small implementation choices taken without asking (CLAUDE.md §1.2), one line ea
   - The other 8 regions stay unknown.
   - **Left out:** the ScienceDirect article S0378377421007216 resolves (Crossref) to Khasanov et al. (2022), *Agricultural Water Management*, doi:10.1016/j.agwat.2021.107444, about **Syrdarya Province**. The 78 % / 95 % figures for Karakalpakstan and Khorezm could not be verified there (paywalled), so it is not cited in the app; the team can add it after checking.
 - **360 px phone layout** checked with device emulation (no horizontal overflow on any step or on /about). The map fits Uzbekistan's bounds instead of a fixed zoom; the stress-test rows and card evidence stack on narrow screens.
+
+## Seventh demo farm: Kashkadarya (2026-11-15, team request)
+
+- **Point.** Same rule as the other farms: nearest MCD12Q1 cropland pixel within 25 km of Karshi (38.86 N, 65.79 E), inside UZ-QA, with a July–August NDVI of at least 0.5. Chosen: 38.8729 N, 65.7293 E, 5.4 km away, class 12 in 22 of 25 pixels, peak 0.50 on 2025-08-29. The 5 nearer candidates peaked at 0.45–0.47. The reason is in `data/regions.json`.
+- **NDVI from 2016-01-01**, like the farms whose download was unfinished (`NDVI_SHORT_RECORD_START`).
+- **`npm run prefetch -- --farm=<id>`** limits the download to one farm. The other six farms were not fetched again, and their built files are byte-identical.
+- **Default rotation `alfalfa_cotton_wheat`** (the demo follows the satellite). MODIS 2023–2025: it agrees in 39 composites and differs in 0. `wheat_silage` (25/3) and `barley_sorghum` (22/3) also agree; `cotton_wheat` gives "please check" (green 25 Jun → 2 Jan 2024).
+  - Caveat: the field never looks bare (NDVI 0.3–0.5 all year), so the 3-year window cannot tell an alfalfa phase from a mixed or perennial pixel.
+- **Salinity stays unknown.** No source could be verified:
+  - FAO Water Report 15 gives < 10 % only for the "upper reaches" and does not name Kashkadarya.
+  - Kulmatov (2014) does not name it.
+  - Doniyorov & Kuvatov (2024, doi:10.25077/aijans.v5.i2.58-64.2024) describe one moderately saline trial site, not the region.
+  - Matyakubov et al. (2025, BIO Web of Conferences 151, 04021, doi:10.1051/bioconf/202515104021) may hold regional figures, but the publisher returned HTTP 403, so it was not read.

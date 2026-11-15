@@ -361,26 +361,12 @@ async function fetchFarm(farm: DemoFarmSource, point: DemoPoint): Promise<void> 
   await fetchPower(dir, p, scope);
   log(scope, "POWER daily ready");
 
-  // Soil and elevation use other servers than MODIS, so a slow SoilGrids never holds up the NDVI download.
-  const soilAndTerrain = (async () => {
-    await cached(path.join(dir, "soilgrids.json"), soilGridsResponseSchema, () => get("soilgrids", soilGridsUrl(p), soilGridsResponseSchema));
-    await cached(path.join(dir, "elevation.json"), elevationResponseSchema, () =>
-      get("openMeteo", elevationUrl(slopeSamplePoints(p)), elevationResponseSchema),
-    );
-    log(scope, "SoilGrids and elevation ready");
-  })();
-  const [soilResult, modisResult] = await Promise.allSettled([soilAndTerrain, fetchModis(dir, p, scope, meta, writeMeta)]);
-  const errors = [soilResult, modisResult].flatMap((r) => (r.status === "rejected" ? [r.reason instanceof Error ? r.reason.message : String(r.reason)] : []));
-  if (errors.length > 0) throw new Error(errors.join("; "));
-}
+  await cached(path.join(dir, "soilgrids.json"), soilGridsResponseSchema, () => get("soilgrids", soilGridsUrl(p), soilGridsResponseSchema));
+  await cached(path.join(dir, "elevation.json"), elevationResponseSchema, () =>
+    get("openMeteo", elevationUrl(slopeSamplePoints(p)), elevationResponseSchema),
+  );
+  log(scope, "SoilGrids and elevation ready");
 
-async function fetchModis(
-  dir: string,
-  p: LatLon,
-  scope: string,
-  meta: z.infer<typeof farmRawMetaSchema> | null,
-  writeMeta: (ndviStart: string | undefined) => Promise<void>,
-): Promise<void> {
   const lcDates = await ornlDates(path.join(dir, "mcd12q1_dates.json"), MCD12Q1.product, p);
   const lcLatest = lastOf(lcDates.dates, "MCD12Q1 dates");
   await ornlSubset(path.join(dir, `mcd12q1_${lcLatest.modis_date}.json`), {

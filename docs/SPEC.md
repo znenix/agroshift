@@ -31,7 +31,7 @@ irrigated agriculture (not rain-fed by default), soil salinity, the cotton–whe
 
 | Step | Screen | Content |
 |---|---|---|
-| 1 | **Choose field** | 6 demo-farm buttons + map click anywhere inside Uzbekistan |
+| 1 | **Choose field** | 7 demo-farm buttons + map click anywhere inside Uzbekistan |
 | 2 | **Field conditions** | 12-month climate calendar, long-term trends, "what the satellite saw on your field", soil, indicators |
 | 3 | **Your farm** | current rotation, priorities, constraints, optional soil test |
 | 4 | **Compare rotations** | current + 3 best alternatives: cards, timelines, metrics table |
@@ -100,7 +100,7 @@ scripts/check-demo.ts (offline)             → sanity report for the demo farms
 
 ### 4.1 What gets prefetched
 - **Climate cells:** POWER's native MERRA-2 grid, 0.5° latitude × 0.625° longitude (cell centres at latitude −90 + 0.5·j, longitude −180 + 0.625·i), keeping every cell that overlaps the Uzbekistan polygon (212 cells: 156 with their centre inside the country, 56 along the border) — POWER daily, 2006→now. POWER returns the value of the native cell that contains the requested point (checked 2026-11-14: identical values at 42.46° N 59.10° E and 59.68° E, different at 59.70° E, across the 59.6875° cell edge), so §4.3 reads a field's climate from the cell that contains it, which is exact for POWER. *(Changed from a 0.5° grid, which mixed neighbouring cells; team decision 2026-11-14.)*
-- **6 demo farms:** Tashkent, Fergana, Samarkand, Surxondaryo (Termez), Karakalpakstan (Nukus), Khorezm (Urgench).
+- **7 demo farms:** Tashkent, Fergana, Samarkand, Surxondaryo (Termez), Karakalpakstan (Nukus), Khorezm (Urgench), Kashkadarya (Karshi; added 2026-11-15).
   - **Do not use city-centre coordinates** (they are urban land cover). The script searches candidate points within 25 km of each city and picks the nearest one whose `MCD12Q1` class is 12 or 14 with a high summer NDVI; it records the chosen coordinates and the reason in `data/regions.json`.
   - For demo farms: POWER daily, full MOD13Q1 NDVI series (2006→now), land cover, SoilGrids, elevation + 4 neighbours for slope.
 - *Stretch:* growing-season NDVI for grid cells (3 composites per year) for a national NDVI-trend layer.

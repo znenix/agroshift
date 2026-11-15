@@ -2,7 +2,7 @@
  * Builds the static data the app serves (offline, fast): data/raw/ → public/data/ (SPEC §4.2).
  *
  *   boundaries.json   simplified country and region outlines (map, point-in-country test)
- *   farms/{id}.json   the 6 demo farms: climate, NDVI series, land cover, soil, slope, sources
+ *   farms/{id}.json   the 7 demo farms: climate, NDVI series, land cover, soil, slope, sources
  *   cells/{id}.json   climate for every prefetched native POWER cell
  *   grid.json         list of cells (summary indicators are added in Phase 2)
  *   regions.json      regions with salinity status, and the demo-farm list

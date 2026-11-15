@@ -1,5 +1,5 @@
 /**
- * Offline sanity check of the 6 demo farms in public/data/ (SPEC §10).
+ * Offline sanity check of the 7 demo farms in public/data/ (SPEC §10).
  *
  * FAIL (exit 1): missing or invalid file; point outside Uzbekistan or its region; climate record not
  * starting 2006-01-01, any of the 20 complete years 2006–2025 missing or excluded, implausible values
