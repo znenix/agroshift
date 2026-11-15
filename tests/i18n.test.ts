@@ -83,7 +83,7 @@ describe("translator", () => {
   it("does not report English as missing when it only has the fallback", () => {
     const onMissing = vi.fn();
     const t = createTranslator({ locale: "en", messages: {}, fallback: fallbackMessages, onMissing });
-    expect(t("app.name")).toBe("AgroShift UZ");
+    expect(t("app.name")).toBe("AgroShift");
     expect(onMissing).not.toHaveBeenCalled();
   });
 });
