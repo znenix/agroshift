@@ -1,7 +1,8 @@
 "use client";
 
 /**
- * The /field flow (SPEC §2): choose field → field conditions → your farm → compare rotations → stress test. State
+ * The /field flow (SPEC §2): choose field → field conditions → your farm → compare rotations → stress test →
+ * 14-day forecast (Open-Meteo, not NASA; loaded only on that step). State
  * lives in the URL (?farm=&step= for a demo farm, ?lat=&lon=&step= for a map point) so a step can be
  * linked and the back button works. All engines run in the browser (SPEC §4.3): demo farms come from
  * static files, map points from prepared data only: the static climate cell and the region (lib/point.ts).
@@ -23,6 +24,7 @@ import { StepChoose, type DemoFarm, type PointInfo, type PointVia } from "./Step
 import { StepCompare } from "./StepCompare";
 import { StepConditions } from "./StepConditions";
 import { StepFarm } from "./StepFarm";
+import { StepForecast } from "./StepForecast";
 import { StepStress } from "./StepStress";
 
 const STEPS: ReadonlyArray<{ n: number; label: MessageKey }> = [
@@ -31,10 +33,12 @@ const STEPS: ReadonlyArray<{ n: number; label: MessageKey }> = [
   { n: 3, label: "field.step.farm" },
   { n: 4, label: "field.step.compare" },
   { n: 5, label: "field.step.stress" },
+  { n: 6, label: "field.step.forecast" },
 ];
 const COMPARE_STEP = 4;
 const STRESS_STEP = 5;
-const LAST_STEP = STRESS_STEP;
+const FORECAST_STEP = 6;
+const LAST_STEP = FORECAST_STEP;
 /** SPEC §5.11: re-run the engine about 100 ms after the last slider move. */
 const SCENARIO_DEBOUNCE_MS = 100;
 
@@ -296,6 +300,15 @@ export function FieldFlow() {
             ) : (
               <StepStress profile={profile} normal={analysis} result={stressed ?? analysis} pending={scenarioPending} scenario={scenario} onScenario={setScenario} />
             ))}
+          {step === FORECAST_STEP && (
+            <StepForecast
+              key={profile.farm.id}
+              lat={profile.farm.point.lat}
+              lon={profile.farm.point.lon}
+              rotationYears={answers.current.years}
+              irrigated={answers.farmer.mode === "irrigated"}
+            />
+          )}
         </>
       )}
 

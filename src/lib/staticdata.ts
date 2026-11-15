@@ -13,6 +13,7 @@ import {
   type FarmFile,
   type RegionsFile,
 } from "./datafiles";
+import { forecastResponseSchema, type ForecastResponse } from "./forecast";
 import { pointDataSchema, type PointData } from "./point";
 
 export async function fetchStatic<T>(path: string, schema: z.ZodType<T>, fetchImpl: typeof fetch = fetch): Promise<T> {
@@ -63,5 +64,20 @@ export async function loadPoint(lat: number, lon: number, fetchImpl: typeof fetc
   }
   const parsed = pointDataSchema.safeParse(body);
   if (!parsed.success) throw new Error("/api/point: unexpected response format");
+  return parsed.data;
+}
+
+/** Browser-side limit for /api/forecast: the route itself gives the upstream 8 s. */
+const FORECAST_CLIENT_TIMEOUT_MS = 12_000;
+
+/** The 14-day Open-Meteo forecast for a point, from our own route; any failure throws (the UI says "unavailable"). */
+export async function loadForecast(lat: number, lon: number, fetchImpl: typeof fetch = fetch): Promise<ForecastResponse> {
+  const response = await fetchImpl(`/api/forecast?lat=${lat}&lon=${lon}`, {
+    headers: { Accept: "application/json" },
+    signal: AbortSignal.timeout(FORECAST_CLIENT_TIMEOUT_MS),
+  });
+  if (!response.ok) throw new Error(`/api/forecast: HTTP ${response.status}`);
+  const parsed = forecastResponseSchema.safeParse(await response.json());
+  if (!parsed.success) throw new Error("/api/forecast: unexpected response format");
   return parsed.data;
 }

@@ -261,3 +261,32 @@ export const TOP_ALTERNATIVES = 3;
 export const GEOBOUNDARIES_API_URL = "https://www.geoboundaries.org/api/current/gbOpen/UZB";
 /** ASSUMPTION: Douglas–Peucker tolerance for the boundary file the browser loads (~500 m). */
 export const BOUNDARY_SIMPLIFY_TOLERANCE_DEG = 0.005;
+
+// ── 14-day weather forecast (SPEC §3 stretch; team decision 2026-11-15) ─────────
+/** Open-Meteo forecast API: weather models, not NASA; CC BY 4.0 ("Weather data by Open-Meteo.com"). */
+export const OPEN_METEO_FORECAST_URL = "https://api.open-meteo.com/v1/forecast";
+export const FORECAST_DAYS = 14;
+/** Uzbekistan has one time zone (UTC+5); forecast days are local calendar days. */
+export const FORECAST_TIMEZONE = "Asia/Tashkent";
+/** Team rule: the upstream gets 8 s, then the app shows "forecast unavailable". */
+export const FORECAST_UPSTREAM_TIMEOUT_MS = 8_000;
+/** Forecast points are rounded to 0.01° (~1 km, finer than the weather models' grids) for caching. */
+export const FORECAST_POINT_DECIMALS = 2;
+/** ASSUMPTION: daily mean cloud cover < 30 % reads as "clear", ≥ 70 % as "cloudy", in between "partly cloudy". */
+export const FORECAST_CLOUD_CLEAR_PCT = 30;
+export const FORECAST_CLOUD_CLOUDY_PCT = 70;
+/**
+ * ASSUMPTION: 0–9 cm model soil moisture below 0.15 m³/m³ reads as "dry", 0.25 m³/m³ and above as "moist"
+ * (roughly wilting point and field capacity of a loam; real values depend on texture and irrigation).
+ */
+export const FORECAST_SOIL_DRY_M3M3 = 0.15;
+export const FORECAST_SOIL_MOIST_M3M3 = 0.25;
+/** ASSUMPTION (team): fungal alert when daily mean humidity > 75 % and Tmax 20–30 °C on 2+ consecutive days. */
+export const FUNGAL_HUMIDITY_PCT = 75;
+export const FUNGAL_TMAX_RANGE_C = { min: 20, max: 30 } as const;
+export const FUNGAL_MIN_DAYS = 2;
+/** Team decision: only crops of the farmer's rotation that are in crops.json (grape and tomato are not modelled). */
+export const FUNGAL_SENSITIVE_CROPS: readonly string[] = ["cotton", "melon"];
+/** ASSUMPTION (team): irrigation alert when top soil is dry and rain probability ≤ 10 % on 3+ consecutive days. */
+export const IRRIGATION_RAIN_PROB_MAX_PCT = 10;
+export const IRRIGATION_MIN_DAYS = 3;

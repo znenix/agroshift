@@ -89,6 +89,15 @@ export const ATTRIBUTIONS: readonly Attribution[] = [
     sourceId: "copernicus-dem",
   },
   {
+    id: "open-meteo-forecast",
+    name: "Open-Meteo Forecast API (weather models, not NASA)",
+    use: "about.use.forecast",
+    citation: "Weather data by Open-Meteo.com. Zippenfenig, P. (2024). Open-Meteo.com Weather API. Zenodo. https://doi.org/10.5281/zenodo.7970649. Hourly values averaged to days by AgroShift.",
+    licence: "CC BY 4.0",
+    url: "https://open-meteo.com/",
+    nasa: false,
+  },
+  {
     id: "geoboundaries",
     name: "geoBoundaries gbOpen — Uzbekistan ADM0 and ADM1",
     use: "about.use.geoboundaries",
