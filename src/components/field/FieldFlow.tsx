@@ -9,6 +9,7 @@
  */
 import { useSearchParams } from "next/navigation";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { FieldBackdrop } from "@/components/backgrounds/FieldBackdrop";
 import { useI18n } from "@/components/I18nProvider";
 import { analyze, buildProfile, soilConditions, type FarmAnswers, type FieldProfile } from "@/lib/analysis";
 import { CROPS, ROTATION_TEMPLATES } from "@/lib/catalog";
@@ -243,6 +244,8 @@ export function FieldFlow() {
 
   return (
     <div className="space-y-6">
+      {/* Decorative only (aria-hidden, behind everything): reads the step and the scenario, never changes them. */}
+      <FieldBackdrop step={step} deltaT={scenario.deltaT} rainFactor={scenario.rainFactor} />
       <nav aria-label={t("field.steps_label")}>
         <ol className="flex flex-wrap gap-2">
           {STEPS.map(({ n, label }) => {

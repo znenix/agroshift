@@ -271,3 +271,14 @@ Small implementation choices taken without asking (CLAUDE.md §1.2), one line ea
   - The browser now rounds to 0.01° as well, so every visitor of a farm uses the same CDN entry.
   - When the service fails and a good forecast of the last 6 hours exists, that one is shown, marked "last forecast received (fetched …)" (ASSUMPTION: 6 h).
   - The browser waits up to 22 s, because the route may make two tries of 8 s each.
+
+## Field-themed backgrounds (2026-11-15, team request; visual only)
+
+- **Implementation.** Inline SVG and CSS only, about 11 KB of source; no images and no libraries. The step 1–5 text is byte-identical to before.
+- **Landing.** The landscape (sky glow, sun, mountains, converging crop rows) fills a band below the hero text. Behind the text there is only a 14 % sky tint.
+  - Parallax moves 4 layers by scroll × 0.06–0.24, capped at 48 px, using transform only.
+- **/field.** One fixed backdrop at 14 % opacity behind all content, one layer per step, crossfading in 400 ms.
+  - Step 5 follows the scenario: Dry year turns the rows brown; Hot warms the sky and grows the sun. Colours change over 600 ms.
+- **Contrast.** Worst-case text contrast at 14 % is 4.63:1 (water-700 on `status-warning/25` over deep green). Every text colour was checked against every translucent surface and backdrop colour.
+- **prefers-reduced-motion.** No parallax and no transitions.
+- **Fallback.** If the SVG fails, the plain sand page remains.

@@ -57,3 +57,45 @@
     outline-offset: 2px;
   }
 }
+
+/*
+ * Decorative field backgrounds (visual only). Behind text they never exceed 15 % strength: the landing sky
+ * tint is 14 % sky blue, and the /field backdrop layer is drawn at 14 % opacity (worst-case text contrast
+ * 4.6:1, checked for every text colour on every translucent surface). Plain sand stays underneath.
+ */
+@layer components {
+  .hero {
+    background: linear-gradient(to bottom, color-mix(in srgb, #bcd9ea 14%, var(--color-sand-50)) 0%, var(--color-sand-50) 70%);
+  }
+
+  .parallax {
+    will-change: transform;
+  }
+
+  .field-backdrop {
+    opacity: 0.14;
+  }
+
+  .field-backdrop-layer {
+    transition: opacity 400ms ease-in-out;
+  }
+
+  .bg-fill {
+    transition:
+      fill 600ms ease-in-out,
+      opacity 600ms ease-in-out,
+      transform 600ms ease-in-out;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .parallax {
+      transform: none !important;
+      will-change: auto;
+    }
+
+    .field-backdrop-layer,
+    .bg-fill {
+      transition: none;
+    }
+  }
+}
