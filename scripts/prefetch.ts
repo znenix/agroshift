@@ -13,7 +13,8 @@
  * Every response is validated with zod before it is saved; valid files already on disk are reused,
  * so an interrupted run can simply be started again.
  *
- * Usage: npm run prefetch [-- --farms-only] [-- --reselect]
+ * Usage: npm run prefetch [-- --farms-only] [-- --reselect] [-- --farm=<id>]
+ *   --farm=<id> limits steps 2–3 to one demo farm (implies --farms-only); the other farms are not touched.
  */
 import path from "node:path";
 import process from "node:process";
@@ -78,8 +79,10 @@ import {
 
 const args = new Set(process.argv.slice(2));
 // `npm run prefetch --farms-only` (without `--`) reaches the script as npm_config_farms_only.
-const farmsOnly = args.has("--farms-only") || process.env.npm_config_farms_only === "true";
+const farmsOnlyFlag = args.has("--farms-only") || process.env.npm_config_farms_only === "true";
 const reselect = args.has("--reselect") || process.env.npm_config_reselect === "true";
+const onlyFarm = [...args].find((a) => a.startsWith("--farm="))?.slice("--farm=".length) ?? null;
+const farmsOnly = farmsOnlyFlag || onlyFarm !== null;
 
 // ── Polite access: at most 3 parallel requests per service, a small delay, backoff (SPEC §3.1) ──
 
@@ -358,12 +361,26 @@ async function fetchFarm(farm: DemoFarmSource, point: DemoPoint): Promise<void> 
   await fetchPower(dir, p, scope);
   log(scope, "POWER daily ready");
 
-  await cached(path.join(dir, "soilgrids.json"), soilGridsResponseSchema, () => get("soilgrids", soilGridsUrl(p), soilGridsResponseSchema));
-  await cached(path.join(dir, "elevation.json"), elevationResponseSchema, () =>
-    get("openMeteo", elevationUrl(slopeSamplePoints(p)), elevationResponseSchema),
-  );
-  log(scope, "SoilGrids and elevation ready");
+  // Soil and elevation use other servers than MODIS, so a slow SoilGrids never holds up the NDVI download.
+  const soilAndTerrain = (async () => {
+    await cached(path.join(dir, "soilgrids.json"), soilGridsResponseSchema, () => get("soilgrids", soilGridsUrl(p), soilGridsResponseSchema));
+    await cached(path.join(dir, "elevation.json"), elevationResponseSchema, () =>
+      get("openMeteo", elevationUrl(slopeSamplePoints(p)), elevationResponseSchema),
+    );
+    log(scope, "SoilGrids and elevation ready");
+  })();
+  const [soilResult, modisResult] = await Promise.allSettled([soilAndTerrain, fetchModis(dir, p, scope, meta, writeMeta)]);
+  const errors = [soilResult, modisResult].flatMap((r) => (r.status === "rejected" ? [r.reason instanceof Error ? r.reason.message : String(r.reason)] : []));
+  if (errors.length > 0) throw new Error(errors.join("; "));
+}
 
+async function fetchModis(
+  dir: string,
+  p: LatLon,
+  scope: string,
+  meta: z.infer<typeof farmRawMetaSchema> | null,
+  writeMeta: (ndviStart: string | undefined) => Promise<void>,
+): Promise<void> {
   const lcDates = await ornlDates(path.join(dir, "mcd12q1_dates.json"), MCD12Q1.product, p);
   const lcLatest = lastOf(lcDates.dates, "MCD12Q1 dates");
   await ornlSubset(path.join(dir, `mcd12q1_${lcLatest.modis_date}.json`), {
@@ -441,9 +458,10 @@ async function fetchCells(boundaries: Boundaries): Promise<string[]> {
 
 async function main(): Promise<number> {
   const started = Date.now();
-  log("prefetch", `start${farmsOnly ? " (demo farms only)" : ""}${reselect ? " (reselecting demo points)" : ""}; raw data in ${relative(RAW_DIR)}`);
+  log("prefetch", `start${farmsOnly ? " (demo farms only)" : ""}${reselect ? " (reselecting demo points)" : ""}${onlyFarm !== null ? ` (only ${onlyFarm})` : ""}; raw data in ${relative(RAW_DIR)}`);
   const boundaries = await fetchBoundaries();
   const source = await loadRegionsSource();
+  if (onlyFarm !== null && !source.demo_farms.some((f) => f.id === onlyFarm)) throw new Error(`no demo farm with id ${onlyFarm}`);
   const failures: string[] = [];
 
   // Each farm runs on its own: select → save its point → download its data, so a slow selection
@@ -453,7 +471,7 @@ async function main(): Promise<number> {
   const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
   const farmsDone = Promise.all(
-    source.demo_farms.map(async (farm) => {
+    source.demo_farms.filter((farm) => onlyFarm === null || farm.id === onlyFarm).map(async (farm) => {
       let point = farm.point;
       if (point === null || reselect) {
         try {

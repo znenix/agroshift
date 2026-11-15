@@ -44,7 +44,7 @@ export const regionsSourceSchema = z.object({
         point: demoPointSchema.nullable(),
       }),
     )
-    .length(6),
+    .length(7),
 });
 export type RegionsSource = z.infer<typeof regionsSourceSchema>;
 export type DemoFarmSource = RegionsSource["demo_farms"][number];
