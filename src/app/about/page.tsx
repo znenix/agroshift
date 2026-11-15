@@ -8,7 +8,16 @@ import {
   DRY_YEAR_PERCENTILE,
   FIT_RECOMMENDED_MIN,
   FIT_RISKY_MIN,
+  FORECAST_CLOUD_CLEAR_PCT,
+  FORECAST_CLOUD_CLOUDY_PCT,
+  FORECAST_SOIL_DRY_M3M3,
+  FORECAST_SOIL_MOIST_M3M3,
+  FUNGAL_HUMIDITY_PCT,
+  FUNGAL_MIN_DAYS,
+  FUNGAL_TMAX_RANGE_C,
   IRRIGATION_EFFICIENCY,
+  IRRIGATION_MIN_DAYS,
+  IRRIGATION_RAIN_PROB_MAX_PCT,
   MAX_MISSING_SHARE,
   NDVI_BARE_MAX,
   NDVI_GREEN_MIN,
@@ -65,15 +74,30 @@ export default async function AboutPage() {
     ["about.method.ranking", {}],
     ["about.method.scenario", {}],
   ];
-  const assumptions: readonly MessageKey[] = [
-    "about.assumption.crops",
-    "about.assumption.cotton",
-    "about.assumption.ph",
-    "about.assumption.heat",
-    "about.assumption.efficiency",
-    "about.assumption.dry_year",
-    "about.assumption.defaults",
-    "about.assumption.decisions",
+  const assumptions: ReadonlyArray<[MessageKey, Record<string, string | number>]> = [
+    ["about.assumption.crops", {}],
+    ["about.assumption.cotton", {}],
+    ["about.assumption.ph", {}],
+    ["about.assumption.heat", {}],
+    ["about.assumption.efficiency", {}],
+    ["about.assumption.dry_year", {}],
+    ["about.assumption.defaults", {}],
+    [
+      "about.assumption.forecast",
+      {
+        clear: FORECAST_CLOUD_CLEAR_PCT,
+        cloudy: FORECAST_CLOUD_CLOUDY_PCT,
+        dry: FORECAST_SOIL_DRY_M3M3,
+        moist: FORECAST_SOIL_MOIST_M3M3,
+        humidity: FUNGAL_HUMIDITY_PCT,
+        tmin: FUNGAL_TMAX_RANGE_C.min,
+        tmax: FUNGAL_TMAX_RANGE_C.max,
+        fungal_days: FUNGAL_MIN_DAYS,
+        prob: IRRIGATION_RAIN_PROB_MAX_PCT,
+        irrigation_days: IRRIGATION_MIN_DAYS,
+      },
+    ],
+    ["about.assumption.decisions", {}],
   ];
   const limits: readonly MessageKey[] = [
     "about.limit.power",
@@ -153,8 +177,8 @@ export default async function AboutPage() {
           {t("about.assumptions.title")}
         </h2>
         <ul className="list-disc space-y-2 pl-5">
-          {assumptions.map((key) => (
-            <li key={key}>{t(key)}</li>
+          {assumptions.map(([key, params]) => (
+            <li key={key}>{t(key, params)}</li>
           ))}
         </ul>
       </section>
