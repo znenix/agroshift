@@ -148,7 +148,8 @@ export const soilStateOf = (m3m3: number | null): SoilState | null =>
 /** The parts of the one-line summary; the UI words them in the reader's language. */
 export interface DaySummary {
   sky: Sky | null;
-  rain: { kind: "none" } | { kind: "chance"; probPct: number; mm: number } | { kind: "amount_only"; mm: number } | { kind: "unknown" };
+  /** `mm` is null in "chance" when the model gives a probability but no measurable amount. */
+  rain: { kind: "none" } | { kind: "chance"; probPct: number; mm: number | null } | { kind: "amount_only"; mm: number } | { kind: "unknown" };
   /** "stays" when the previous day had the same state, "becomes" when it changed, "is" on the first day. */
   soil: { state: SoilState; change: "is" | "stays" | "becomes" } | null;
 }
@@ -163,7 +164,7 @@ export function daySummary(day: ForecastDay, previous: ForecastDay | null): DayS
         ? { kind: "none" }
         : prob === null
           ? { kind: "amount_only", mm: mm ?? 0 }
-          : { kind: "chance", probPct: prob, mm: mm ?? 0 };
+          : { kind: "chance", probPct: prob, mm: mm === null || mm === 0 ? null : mm };
   const state = soilStateOf(day.soilMoisture);
   const before = previous === null ? null : soilStateOf(previous.soilMoisture);
   return {

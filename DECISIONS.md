@@ -232,3 +232,31 @@ Small implementation choices taken without asking (CLAUDE.md §1.2), one line ea
 - **Missing slope.** Without slope, erosion is computed as for flat ground and the steep-slope check is skipped. This was already the behaviour when slope could not be fetched; the gap text now says so.
 - **Confidence.** The vegetation-trend and slope indicators drop to "low" when their input is missing. Soil and salinity were already low, so demo farms are unaffected.
 - **Location line.** It shows the region name and the distance from the point to its POWER cell's centre (at most about 40 km).
+
+## Forecast step (2026-11-15, team request)
+
+- **Scope (team answers).**
+  - Step 6 "Forecast" comes after the stress test.
+  - RH2M (NASA POWER humidity) is skipped for now, so there is no historical humidity factor and the rankings are unchanged.
+  - Fungal-sensitive crops are cotton and melon only; grape and tomato are not in crops.json.
+  - The branch was taken from `main` after "any point" (tag `demo-stable-2`), not from `demo-stable`, which predates "any point".
+- **`/api/forecast`.**
+  - Fetches Open-Meteo, 14 local days (Asia/Tashkent), with one try and an 8 s timeout. Any failure returns 502 and the step says "forecast unavailable".
+  - Points are rounded to 0.01°, outside Uzbekistan is refused, and answers are cached for 1 hour.
+  - The step loads only when it is open; steps 1–5 never call it. Their visible text is identical to `main` for two demo farms and one map point, apart from the new nav button.
+- **Daily values.**
+  - Cloud cover, humidity and soil moisture are daily means of the hourly values, with at least 20 of 24 hours (ASSUMPTION).
+  - Soil moisture is the depth-weighted mean over 0–9 cm (layers of 1, 2 and 6 cm). In the current Open-Meteo output the three layers are identical.
+- **Summary words (ASSUMPTION).**
+  - Sky: clear below 30 % cloud, cloudy from 70 %.
+  - Top soil: dry below 0.15 m³/m³, moist from 0.25 m³/m³, roughly wilting point and field capacity of a loam.
+  - "Stays" or "becomes" compares with the previous day's class.
+- **Alerts (team rules, ASSUMPTION thresholds, forecast only).**
+  - Fungal: daily mean humidity above 75 % and Tmax 20–30 °C on 2 or more consecutive days, when cotton or melon is in the farmer's current rotation.
+  - Irrigation: top soil dry and rain probability of 10 % or less on 3 or more consecutive days, shown for irrigated fields only.
+  - A day with a missing value never counts towards an alert.
+- **Honesty.**
+  - A badge reads "Open-Meteo weather models, not NASA".
+  - The note says model soil moisture is not a field measurement and may not reflect irrigation.
+  - The "Weather data by Open-Meteo.com" link and CC BY 4.0 sit next to the data, and the hourly-to-daily change is stated.
+  - The About page lists the source; its citation was checked on DataCite.

@@ -162,7 +162,9 @@ function summaryLine(t: TranslateFn, locale: Locale, day: ForecastDay, previous:
   const mm = (v: number) => formatNumber(v, locale, { maximumFractionDigits: 1 });
   const weather =
     s.rain.kind === "chance"
-      ? t("forecast.summary.chance", { sky, prob: s.rain.probPct, mm: mm(s.rain.mm) })
+      ? s.rain.mm === null
+        ? t("forecast.summary.chance_only", { sky, prob: s.rain.probPct })
+        : t("forecast.summary.chance", { sky, prob: s.rain.probPct, mm: mm(s.rain.mm) })
       : s.rain.kind === "amount_only"
         ? t("forecast.summary.amount_only", { sky, mm: mm(s.rain.mm) })
         : t(s.rain.kind === "none" ? "forecast.summary.none" : "forecast.summary.unknown", { sky });

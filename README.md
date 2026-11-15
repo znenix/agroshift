@@ -7,7 +7,7 @@ Built for the NASA Space Apps Challenge 2026, challenge *Field Shift: Adapting F
 
 ## What it does
 
-`/field` walks through five steps:
+`/field` walks through six steps:
 
 1. **Choose field.** Pick a demo farm, click anywhere on the map, use **My location**, or type coordinates.
 2. **Field conditions.**
@@ -22,6 +22,11 @@ Built for the NASA Space Apps Challenge 2026, challenge *Field Shift: Adapting F
 5. **Stress test.**
    - Normal, Dry year (rain −30 %) and Hot (+2 °C) presets, or custom ΔT and Δrain.
    - The whole calculation re-runs in the browser and the ranking animates. Labelled "What-if test, not a forecast".
+6. **Forecast.**
+   - 14 days from the Open-Meteo forecast API (weather models, not NASA), fetched live by `GET /api/forecast`.
+   - For each day: rain, rain probability, cloud cover, humidity, 0–9 cm soil moisture, ET0, and a one-line summary.
+   - Two alerts with ASSUMPTION thresholds: fungal risk (cotton or melon in the rotation) and an irrigation check (irrigated fields).
+   - If the service fails or takes more than 8 s, the step says "forecast unavailable"; the other steps never call it.
 
 `/about` lists data sources with citations, methods, assumptions, limitations, a glossary and the AI-use disclosure.
 
@@ -85,6 +90,7 @@ NASA datasets and services:
 Partner and other data:
 - **SoilGrids 2.0**. Poggio, L. et al. (2021), SOIL 7, 217–240, doi:10.5194/soil-7-217-2021. CC BY 4.0.
 - **Copernicus DEM GLO-90**. ESA, doi:10.5270/ESA-c5d3d65, served via the Open-Meteo Elevation API (CC BY 4.0).
+- **Open-Meteo Forecast API** (step 6, weather models, not NASA). "Weather data by Open-Meteo.com", CC BY 4.0; Zippenfenig, P. (2024), doi:10.5281/zenodo.7970649. Free for non-commercial use.
 - **geoBoundaries** gbOpen UZB ADM0/ADM1. Runfola, D. et al. (2020), PLoS ONE 15(4): e0231866. © OpenStreetMap contributors, ODbL.
 - **Basemap**: © OpenFreeMap, © OpenMapTiles, © OpenStreetMap contributors; fallback © CARTO.
 
@@ -105,7 +111,7 @@ The UI is available in Uzbek (Latin script, default), Russian and English.
 3. No environment variables are needed. Optional, stretch goal only: `ANTHROPIC_API_KEY` and `ANTHROPIC_MODEL` for `/api/explain`.
 4. Deploy. Then open `/field?farm=karakalpakstan&step=4`, `/field?lat=40.348&lon=71.787&step=2` and `/about` on a phone and a laptop.
 
-`/api/point` declares `maxDuration = 60` seconds; that fits Vercel's limits. Its responses are cached at the edge: 7 days when complete, 5 minutes when partial.
+`/api/point` declares `maxDuration = 60` seconds; that fits Vercel's limits. Its responses are cached at the edge: 7 days when complete, 5 minutes when partial. `/api/forecast` declares 15 seconds and is cached for 1 hour.
 
 ## AI-use disclosure
 

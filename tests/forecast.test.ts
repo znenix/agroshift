@@ -114,6 +114,8 @@ describe("forecast: one-line summary", () => {
     expect(daySummary(day("2026-06-01"), null).rain).toEqual({ kind: "none" });
     expect(daySummary(day("2026-06-01", { rainProbPct: null, rainMm: 2 }), null).rain).toEqual({ kind: "amount_only", mm: 2 });
     expect(daySummary(day("2026-06-01", { rainProbPct: null, rainMm: null }), null).rain).toEqual({ kind: "unknown" });
+    // A probability without a measurable amount is not worded as "0 mm".
+    expect(daySummary(day("2026-06-01", { rainProbPct: 4, rainMm: 0 }), null).rain).toEqual({ kind: "chance", probPct: 4, mm: null });
     expect(daySummary(day("2026-06-01", { soilMoisture: null }), null).soil).toBeNull();
     expect(daySummary(day("2026-06-02", { soilMoisture: 0.1 }), day("2026-06-01")).soil).toEqual({ state: "dry", change: "becomes" });
   });
