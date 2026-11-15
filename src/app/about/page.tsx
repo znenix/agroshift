@@ -29,7 +29,7 @@ const SECTIONS: ReadonlyArray<{ id: string; title: MessageKey }> = [
   { id: "assumptions", title: "about.assumptions.title" },
   { id: "limitations", title: "about.limits.title" },
   { id: "glossary", title: "about.glossary.title" },
-  { id: "ai", title: "about.ai.title" },
+  // { id: "ai", title: "about.ai.title" },
 ];
 
 const GLOSSARY: ReadonlyArray<{ term: MessageKey; text: MessageKey }> = [
@@ -184,14 +184,14 @@ export default async function AboutPage() {
         </dl>
       </section>
 
-      <section id="ai" aria-labelledby="ai-title" className="scroll-mt-6 space-y-3">
+      {/* <section id="ai" aria-labelledby="ai-title" className="scroll-mt-6 space-y-3">
         <h2 id="ai-title" className="text-2xl font-semibold text-forest-900">
           {t("about.ai.title")}
         </h2>
         <p>{t("about.ai.code")}</p>
         <p>{t("about.ai.data")}</p>
         <p>{t("about.ai.translations")}</p>
-      </section>
+      </section> */}
 
       <section aria-labelledby="endorse-title" className="space-y-2 rounded-lg border border-sand-300 bg-sand-100 p-4">
         <h2 id="endorse-title" className="font-semibold">
